@@ -6,6 +6,11 @@ green='\033[0;32m'
 yellow='\033[0;33m'
 plain='\033[0m'
 
+# Gitee仓库信息
+GITEE_OWNER="YX-love"
+GITEE_REPO="3x-ui"
+GITEE_URL="https://gitee.com/${GITEE_OWNER}/${GITEE_REPO}"
+
 # 检查是否为root用户
 [[ $EUID -ne 0 ]] && echo -e "${red}错误: ${plain} 必须使用root用户运行此脚本！\n" && exit 1
 
@@ -135,6 +140,70 @@ check_status() {
     fi
 }
 
+# 获取Gitee最新版本
+get_latest_version() {
+    # 使用curl获取最新的release信息
+    local result=$(curl -s "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/releases/latest")
+    
+    # 解析JSON获取tag_name
+    local tag_name=$(echo "$result" | grep -o '"tag_name":"[^"]*' | sed 's/"tag_name":"//')
+    
+    # 如果tag_name为空，则使用手动设置的默认版本
+    if [[ -z "$tag_name" ]]; then
+        echo "v2.6.0"
+    else
+        echo "$tag_name"
+    fi
+}
+
+# 从Gitee下载资源
+download_from_gitee() {
+    local version=$1
+    local file_name="x-ui-linux-${arch}.tar.gz"
+    local download_url="${GITEE_URL}/releases/download/${version}/${file_name}"
+    
+    echo "开始从Gitee下载 ${download_url}"
+    wget -N --no-check-certificate -O "/usr/local/${file_name}" "${download_url}"
+    
+    if [[ $? -ne 0 ]]; then
+        # 如果第一种链接格式失败，尝试另一种
+        download_url="${GITEE_URL}/releases/v2.6.0/download/${file_name}"
+        echo "尝试备用链接: ${download_url}"
+        wget -N --no-check-certificate -O "/usr/local/${file_name}" "${download_url}"
+        
+        if [[ $? -ne 0 ]]; then
+            # 如果还是失败，尝试直接下载release列表中的第一个附件
+            echo "尝试直接下载release附件"
+            release_id=$(curl -s "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/releases/latest" | grep -o '"id":[0-9]*' | head -1 | awk -F':' '{print $2}')
+            
+            if [[ -n "$release_id" ]]; then
+                # 获取该release的所有附件
+                assets=$(curl -s "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/releases/${release_id}/assets")
+                # 获取对应架构的附件下载链接
+                download_url=$(echo "$assets" | grep -o "\"browser_download_url\":\"[^\"]*${arch}[^\"]*\"" | head -1 | awk -F'"' '{print $4}')
+                
+                if [[ -n "$download_url" ]]; then
+                    echo "使用API获取的下载链接: ${download_url}"
+                    wget -N --no-check-certificate -O "/usr/local/${file_name}" "${download_url}"
+                    
+                    if [[ $? -ne 0 ]]; then
+                        echo -e "${red}下载 x-ui 失败，请手动上传 ${file_name} 到 /usr/local/ 目录下${plain}"
+                        return 1
+                    fi
+                else
+                    echo -e "${red}未找到适合 ${arch} 架构的下载链接${plain}"
+                    return 1
+                fi
+            else
+                echo -e "${red}未找到最新的release ID${plain}"
+                return 1
+            fi
+        fi
+    fi
+    
+    return 0
+}
+
 # 安装x-ui面板
 install_x_ui() {
     systemctl stop x-ui
@@ -142,25 +211,20 @@ install_x_ui() {
 
     if [ $# == 0 ]; then
         # 获取最新版本号
-        last_version=$(curl -Ls "https://gitee.com/api/v5/repos/YX-love/3x-ui/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-        if [[ ! -n "$last_version" ]]; then
-            echo -e "${red}检测 x-ui 版本失败，可能是超出 Gitee API 限制，请稍后再试，或手动指定 x-ui 版本安装${plain}"
-            exit 1
-        fi
+        last_version=$(get_latest_version)
         echo -e "检测到 x-ui 最新版本：${last_version}，开始安装"
         
         # 下载最新版本
-        wget -N --no-check-certificate -O /usr/local/x-ui-linux-${arch}.tar.gz https://gitee.com/YX-love/3x-ui/attach_files/1529099/download/x-ui-linux-${arch}.tar.gz
+        download_from_gitee "${last_version}"
         if [[ $? -ne 0 ]]; then
-            echo -e "${red}下载 x-ui 失败，请确保你的服务器能够下载 Gitee 的文件${plain}"
+            echo -e "${red}下载 x-ui 失败，请确保服务器能够访问 Gitee${plain}"
             exit 1
         fi
     else
         # 安装指定版本
         last_version=$1
-        url="https://gitee.com/YX-love/3x-ui/attach_files/1529099/download/x-ui-linux-${arch}.tar.gz"
         echo -e "开始安装 x-ui v$1"
-        wget -N --no-check-certificate -O /usr/local/x-ui-linux-${arch}.tar.gz ${url}
+        download_from_gitee "${last_version}"
         if [[ $? -ne 0 ]]; then
             echo -e "${red}下载 x-ui v$1 失败，请确保此版本存在${plain}"
             exit 1
@@ -179,7 +243,7 @@ install_x_ui() {
     cp -f x-ui.service /etc/systemd/system/
     
     # 下载管理脚本
-    wget --no-check-certificate -O /usr/bin/x-ui https://gitee.com/YX-love/3x-ui/raw/master/x-ui.sh
+    wget --no-check-certificate -O /usr/bin/x-ui "${GITEE_URL}/raw/master/x-ui.sh"
     chmod +x /usr/local/x-ui/x-ui.sh
     chmod +x /usr/bin/x-ui
     
