@@ -50,6 +50,38 @@ if [ "$(getconf WORD_BIT)" != '32' ] && [ "$(getconf LONG_BIT)" != '64' ] ; then
     exit 2
 fi
 
+# 随机生成端口（10000-65000之间）
+gen_random_port() {
+    echo $(shuf -i 10000-65000 -n 1)
+}
+
+# 生成随机字符串
+gen_random_string() {
+    length=$1
+    cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w $length | head -n 1
+}
+
+# 生成随机用户名（8位字符）
+gen_random_username() {
+    gen_random_string 8
+}
+
+# 生成随机密码（16位字符）
+gen_random_password() {
+    gen_random_string 16
+}
+
+# 生成随机URL路径（8位字符）
+gen_random_path() {
+    gen_random_string 8
+}
+
+# 生成随机安全参数
+PANEL_PORT=$(gen_random_port)
+PANEL_USER=$(gen_random_username)
+PANEL_PASS=$(gen_random_password)
+PANEL_PATH="/$(gen_random_path)"
+
 # 国内镜像源替换函数
 use_china_mirror() {
     if [ -f /etc/apt/sources.list ]; then
@@ -183,16 +215,16 @@ install_x_ui() {
     chmod +x x-ui bin/xray-linux-${arch}
     cp -f x-ui.service /etc/systemd/system/
     
-    # 创建默认的配置文件
+    # 创建必要的目录
     mkdir -p /etc/x-ui
     mkdir -p /var/log/x-ui
     
-    # 创建默认配置
+    # 创建安全配置文件（使用随机端口和路径）
     cat > /usr/local/x-ui/config.json << EOF
 {
     "panel": {
-        "listen": ":54321",
-        "baseUrl": "",
+        "listen": ":${PANEL_PORT}",
+        "baseUrl": "${PANEL_PATH}",
         "sessionMaxAge": 43200,
         "pageSize": 20,
         "session_timeout": 720,
@@ -236,7 +268,7 @@ EOF
     chmod +x /usr/local/x-ui/x-ui.sh
     chmod +x /usr/bin/x-ui
     
-    # 安装后配置
+    # 安装后配置 - 设置随机用户名和密码
     config_after_install
     
     # 启动服务
@@ -247,13 +279,13 @@ EOF
     # 显示安装信息
     echo -e "${green}x-ui ${last_version}${plain} 安装完成，面板已启动"
     echo -e ""
-    echo -e "面板访问信息如下:"
+    echo -e "面板访问信息如下(请妥善保存):"
     echo -e "------------------------"
-    echo -e "面板地址: ${green}http://服务器IP:54321${plain}"
-    echo -e "用户名: ${green}admin${plain}"
-    echo -e "密码: ${green}admin${plain}"
+    echo -e "面板地址: ${green}http://服务器IP:${PANEL_PORT}${PANEL_PATH}${plain}"
+    echo -e "用户名: ${green}${PANEL_USER}${plain}"
+    echo -e "密码: ${green}${PANEL_PASS}${plain}"
     echo -e "------------------------"
-    echo -e "请妥善保管上述信息，登录后请尽快修改默认用户名和密码"
+    echo -e "${red}注意: 以上访问信息是随机生成的，请务必记录保存，丢失将无法找回！${plain}"
     echo -e ""
     echo -e "x-ui 管理脚本使用方法: "
     echo -e "----------------------------------------------"
@@ -272,21 +304,14 @@ EOF
     echo -e "----------------------------------------------"
 }
 
-# 安装后配置
+# 安装后配置 - 设置随机用户名和密码
 config_after_install() {
     echo -e "${yellow}正在进行安装后配置...${plain}"
     
-    # 设置默认用户名和密码
-    local config_file="/usr/local/x-ui/config.json"
-    if [ -f "$config_file" ]; then
-        # 设置中文为默认语言
-        sed -i 's/"language": "English"/"language": "中文"/g' "$config_file"
-        echo -e "${green}已将默认语言设置为中文${plain}"
-    else
-        echo -e "${yellow}警告: 配置文件 $config_file 不存在，将使用默认配置${plain}"
-    fi
+    # 运行x-ui命令设置随机用户名和密码
+    /usr/local/x-ui/x-ui setting -username ${PANEL_USER} -password ${PANEL_PASS}
     
-    echo -e "${green}配置完成！${plain}"
+    echo -e "${green}面板账号密码设置成功！${plain}"
 }
 
 # 执行安装
