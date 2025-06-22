@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# 定义颜色变量
 red='\033[0;31m'
 green='\033[0;32m'
 yellow='\033[0;33m'
@@ -27,7 +28,7 @@ else
     echo -e "${red}未检测到系统版本，请联系开发者！${plain}\n" && exit 1
 fi
 
-# 系统架构检测
+# 检测系统架构
 arch=$(arch)
 
 if [[ $arch == "x86_64" || $arch == "x64" || $arch == "amd64" ]]; then
@@ -43,7 +44,7 @@ fi
 
 echo "架构: ${arch}"
 
-# 系统版本检测
+# 检查系统版本
 if [ -f /etc/os-release ]; then
     os_version=$(awk -F'[= ."]' '/VERSION_ID/{print $3}' /etc/os-release)
 fi
@@ -70,6 +71,7 @@ fi
 GITEE_MIRROR="https://gitee.com/YX-love/3x-ui"
 GITEE_API="https://gitee.com/api/v5/repos/YX-love/3x-ui"
 
+# 确认提示函数
 confirm() {
     if [[ $# > 1 ]]; then
         echo && read -p "$1 [默认$2]: " temp
@@ -86,6 +88,7 @@ confirm() {
     fi
 }
 
+# 重启面板确认
 confirm_restart() {
     confirm "是否重启面板" "y"
     if [[ $? == 0 ]]; then
@@ -95,13 +98,15 @@ confirm_restart() {
     fi
 }
 
+# 返回主菜单
 before_show_menu() {
     echo && echo -n -e "${yellow}按回车返回主菜单: ${plain}" && read temp
     show_menu
 }
 
+# 安装面板
 install() {
-    bash <(curl -Ls https://gitee.com/YX-love/3x-ui/raw/main/install.sh)
+    bash <(curl -Ls https://gitee.com/YX-love/3x-ui/raw/master/install.sh)
     if [[ $? == 0 ]]; then
         if [[ $# == 0 ]]; then
             start
@@ -111,6 +116,7 @@ install() {
     fi
 }
 
+# 更新面板
 update() {
     confirm "本功能会强制重装当前最新版，数据不会丢失，是否继续?" "n"
     if [[ $? != 0 ]]; then
@@ -120,13 +126,14 @@ update() {
         fi
         return 0
     fi
-    bash <(curl -Ls https://gitee.com/YX-love/3x-ui/raw/main/install.sh)
+    bash <(curl -Ls https://gitee.com/YX-love/3x-ui/raw/master/install.sh)
     if [[ $? == 0 ]]; then
         echo -e "${green}更新完成，已自动重启面板${plain}"
         exit 0
     fi
 }
 
+# 卸载面板
 uninstall() {
     confirm "确定要卸载面板吗?" "n"
     if [[ $? != 0 ]]; then
@@ -146,6 +153,7 @@ uninstall() {
     echo -e "${green}卸载成功${plain}"
 }
 
+# 重置用户名和密码
 reset_user() {
     confirm "确定要将用户名和密码重置为 admin 吗?" "n"
     if [[ $? != 0 ]]; then
@@ -159,6 +167,7 @@ reset_user() {
     confirm_restart
 }
 
+# 重置面板设置
 reset_config() {
     confirm "确定要重置所有面板设置吗，账号数据不会丢失，用户名和密码不会改变" "n"
     if [[ $? != 0 ]]; then
@@ -172,6 +181,7 @@ reset_config() {
     confirm_restart
 }
 
+# 显示当前设置
 check_config() {
     info=$(/usr/local/x-ui/x-ui setting -show)
     if [[ $? != 0 ]]; then
@@ -181,6 +191,7 @@ check_config() {
     echo -e "${info}"
 }
 
+# 设置面板端口
 set_port() {
     echo && echo -n -e "输入端口号[1-65535]: " && read port
     if [[ -z "${port}" ]]; then
@@ -193,6 +204,7 @@ set_port() {
     fi
 }
 
+# 启动面板
 start() {
     check_status
     if [[ $? == 0 ]]; then
@@ -214,6 +226,7 @@ start() {
     fi
 }
 
+# 停止面板
 stop() {
     check_status
     if [[ $? == 1 ]]; then
@@ -235,6 +248,7 @@ stop() {
     fi
 }
 
+# 重启面板
 restart() {
     systemctl restart x-ui
     sleep 2
@@ -249,6 +263,7 @@ restart() {
     fi
 }
 
+# 查看面板状态
 status() {
     systemctl status x-ui -l
     if [[ $# == 0 ]]; then
@@ -256,6 +271,7 @@ status() {
     fi
 }
 
+# 设置开机自启
 enable() {
     systemctl enable x-ui
     if [[ $? == 0 ]]; then
@@ -269,6 +285,7 @@ enable() {
     fi
 }
 
+# 取消开机自启
 disable() {
     systemctl disable x-ui
     if [[ $? == 0 ]]; then
@@ -282,6 +299,7 @@ disable() {
     fi
 }
 
+# 查看面板日志
 show_log() {
     journalctl -u x-ui.service -e --no-pager -f
     if [[ $# == 0 ]]; then
@@ -289,12 +307,13 @@ show_log() {
     fi
 }
 
+# 迁移v2-ui数据
 migrate_v2_ui() {
     /usr/local/x-ui/x-ui v2-ui
-
     before_show_menu
 }
 
+# 安装BBR
 install_bbr() {
     # 优先使用国内镜像
     echo -e "${green}开始安装 BBR...${plain}"
@@ -302,8 +321,9 @@ install_bbr() {
     echo -e "${green}BBR 安装完成！${plain}"
 }
 
+# 更新管理脚本
 update_shell() {
-    wget -O /usr/bin/x-ui -N --no-check-certificate https://gitee.com/YX-love/3x-ui/raw/main/x-ui.sh
+    wget -O /usr/bin/x-ui -N --no-check-certificate https://gitee.com/YX-love/3x-ui/raw/master/x-ui.sh
     if [[ $? != 0 ]]; then
         echo ""
         echo -e "${red}下载脚本失败，请检查本机能否连接 Gitee${plain}"
@@ -314,7 +334,8 @@ update_shell() {
     fi
 }
 
-# 0: running, 1: not running, 2: not installed
+# 检查面板状态
+# 返回值: 0-运行中, 1-未运行, 2-未安装
 check_status() {
     if [[ ! -f /etc/systemd/system/x-ui.service ]]; then
         return 2
@@ -327,6 +348,7 @@ check_status() {
     fi
 }
 
+# 检查是否开机自启
 check_enabled() {
     temp=$(systemctl is-enabled x-ui)
     if [[ x"${temp}" == x"enabled" ]]; then
@@ -336,6 +358,7 @@ check_enabled() {
     fi
 }
 
+# 检查是否已安装
 check_uninstall() {
     check_status
     if [[ $? != 2 ]]; then
@@ -350,6 +373,7 @@ check_uninstall() {
     fi
 }
 
+# 检查是否已安装
 check_install() {
     check_status
     if [[ $? == 2 ]]; then
@@ -364,6 +388,7 @@ check_install() {
     fi
 }
 
+# 显示状态
 show_status() {
     check_status
     case $? in
@@ -381,6 +406,7 @@ show_status() {
     show_xray_status
 }
 
+# 显示开机自启状态
 show_enable_status() {
     check_enabled
     if [[ $? == 0 ]]; then
@@ -390,6 +416,7 @@ show_enable_status() {
     fi
 }
 
+# 检查xray状态
 check_xray_status() {
     count=$(ps -ef | grep "xray-linux" | grep -v "grep" | wc -l)
     if [[ count -ne 0 ]]; then
@@ -399,6 +426,7 @@ check_xray_status() {
     fi
 }
 
+# 显示xray状态
 show_xray_status() {
     check_xray_status
     if [[ $? == 0 ]]; then
@@ -408,6 +436,7 @@ show_xray_status() {
     fi
 }
 
+# 显示使用帮助
 show_usage() {
     echo "x-ui 管理脚本使用方法: "
     echo "------------------------------------------"
@@ -426,6 +455,7 @@ show_usage() {
     echo "------------------------------------------"
 }
 
+# 显示菜单
 show_menu() {
     echo -e "
   ${green}x-ui 面板管理脚本${plain}
@@ -495,6 +525,7 @@ show_menu() {
     esac
 }
 
+# 处理命令行参数
 if [[ $# > 0 ]]; then
     case $1 in
         "start") check_install 0 && start 0

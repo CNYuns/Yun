@@ -1,8 +1,8 @@
 # 3x-ui
 
-> **声明**：该项目仅供学习交流使用，禁止用于非法用途，使用者与本项目开发者无关
+> **声明**: 该项目仅供学习交流使用，禁止用于非法用途，使用者与本项目开发者无关
 
-> **注意**：本仓库是 [MHSanaei/3x-ui](https://github.com/MHSanaei/3x-ui) 的国内优化版本，已针对国内网络环境进行优化
+> **注意**: 本仓库是 [MHSanaei/3x-ui](https://github.com/MHSanaei/3x-ui) 的国内优化版本，已针对国内网络环境进行优化
 
 3x-ui 是一个支持多协议多用户的 xray 面板，支持 V2ay、Trojan、Shadowsocks 等协议。
 
@@ -23,7 +23,7 @@
 ## 一键安装 & 升级
 
 ```bash
-bash <(curl -Ls https://gitee.com/YX-love/3x-ui/raw/main/install.sh)
+bash <(curl -Ls https://gitee.com/YX-love/3x-ui/raw/master/install.sh)
 ```
 
 ## 手动安装 & 升级

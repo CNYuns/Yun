@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# 定义颜色变量
 red='\033[0;31m'
 green='\033[0;32m'
 yellow='\033[0;33m'
@@ -8,7 +9,7 @@ plain='\033[0m'
 # 检查是否为root用户
 [[ $EUID -ne 0 ]] && echo -e "${red}错误: ${plain} 必须使用root用户运行此脚本！\n" && exit 1
 
-# 检查系统
+# 检查系统类型
 if [[ -f /etc/redhat-release ]]; then
     release="centos"
 elif cat /etc/issue | grep -Eqi "debian"; then
@@ -27,6 +28,7 @@ else
     echo -e "${red}未检测到系统版本，请联系开发者！${plain}\n" && exit 1
 fi
 
+# 检测系统架构
 arch=$(arch)
 
 if [[ $arch == "x86_64" || $arch == "x64" || $arch == "amd64" ]]; then
@@ -42,12 +44,13 @@ fi
 
 echo "架构: ${arch}"
 
+# 检查系统位数
 if [ "$(getconf WORD_BIT)" != '32' ] && [ "$(getconf LONG_BIT)" != '64' ] ; then
     echo "本软件不支持 32 位系统(x86)，请使用 64 位系统(x86_64)，如果检测有误，请联系作者"
     exit 2
 fi
 
-# 国内镜像源替换
+# 国内镜像源替换函数
 use_china_mirror() {
     if [ -f /etc/apt/sources.list ]; then
         # 备份原始源
@@ -82,10 +85,9 @@ if [ $? -ne 0 ]; then
     use_china_mirror
 fi
 
-# 更新系统软件包
+# 获取系统版本
 os_version=""
 
-# os version
 if [[ -f /etc/os-release ]]; then
     os_version=$(awk -F'[= ."]' '/VERSION_ID/{print $3}' /etc/os-release)
 fi
@@ -93,6 +95,7 @@ if [[ -z "$os_version" && -f /etc/lsb-release ]]; then
     os_version=$(awk -F'[= ."]+' '/DISTRIB_RELEASE/{print $2}' /etc/lsb-release)
 fi
 
+# 检查系统版本
 if [[ x"${release}" == x"centos" ]]; then
     if [[ ${os_version} -le 6 ]]; then
         echo -e "${red}请使用 CentOS 7 或更高版本的系统！${plain}\n" && exit 1
@@ -107,6 +110,7 @@ elif [[ x"${release}" == x"debian" ]]; then
     fi
 fi
 
+# 安装基础软件包
 install_base() {
     if [[ x"${release}" == x"centos" ]]; then
         yum install epel-release -y
@@ -117,7 +121,8 @@ install_base() {
     fi
 }
 
-# 0: running, 1: not running, 2: not installed
+# 检查面板状态
+# 返回值: 0-运行中, 1-未运行, 2-未安装
 check_status() {
     if [[ ! -f /etc/systemd/system/x-ui.service ]]; then
         return 2
@@ -130,23 +135,28 @@ check_status() {
     fi
 }
 
-install_x-ui() {
+# 安装x-ui面板
+install_x_ui() {
     systemctl stop x-ui
     cd /usr/local/
 
     if [ $# == 0 ]; then
+        # 获取最新版本号
         last_version=$(curl -Ls "https://gitee.com/api/v5/repos/YX-love/3x-ui/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
         if [[ ! -n "$last_version" ]]; then
             echo -e "${red}检测 x-ui 版本失败，可能是超出 Gitee API 限制，请稍后再试，或手动指定 x-ui 版本安装${plain}"
             exit 1
         fi
         echo -e "检测到 x-ui 最新版本：${last_version}，开始安装"
+        
+        # 下载最新版本
         wget -N --no-check-certificate -O /usr/local/x-ui-linux-${arch}.tar.gz https://gitee.com/YX-love/3x-ui/attach_files/1529099/download/x-ui-linux-${arch}.tar.gz
         if [[ $? -ne 0 ]]; then
             echo -e "${red}下载 x-ui 失败，请确保你的服务器能够下载 Gitee 的文件${plain}"
             exit 1
         fi
     else
+        # 安装指定版本
         last_version=$1
         url="https://gitee.com/YX-love/3x-ui/attach_files/1529099/download/x-ui-linux-${arch}.tar.gz"
         echo -e "开始安装 x-ui v$1"
@@ -157,6 +167,7 @@ install_x-ui() {
         fi
     fi
 
+    # 删除旧目录并解压
     if [[ -e /usr/local/x-ui/ ]]; then
         rm /usr/local/x-ui/ -rf
     fi
@@ -166,19 +177,20 @@ install_x-ui() {
     cd x-ui
     chmod +x x-ui bin/xray-linux-${arch}
     cp -f x-ui.service /etc/systemd/system/
-    wget --no-check-certificate -O /usr/bin/x-ui https://gitee.com/YX-love/3x-ui/raw/main/x-ui.sh
+    
+    # 下载管理脚本
+    wget --no-check-certificate -O /usr/bin/x-ui https://gitee.com/YX-love/3x-ui/raw/master/x-ui.sh
     chmod +x /usr/local/x-ui/x-ui.sh
     chmod +x /usr/bin/x-ui
+    
+    # 安装后配置
     config_after_install
-    #echo -e "如果是全新安装，默认网页端口为 ${green}54321${plain}，用户名和密码默认都是 ${green}admin${plain}"
-    #echo -e "请自行确保此端口没有被其他程序占用，${yellow}并且确保 54321 端口已放行${plain}"
-    #    echo -e "若想将 54321 修改为其它端口，输入 x-ui 命令进行修改，同样也要确保你修改的端口也是放行的"
-    #echo -e ""
-    #echo -e "如果是更新面板，则按你之前的方式访问面板"
-    #echo -e ""
+    
+    # 启动服务
     systemctl daemon-reload
     systemctl enable x-ui
     systemctl start x-ui
+    
     echo -e "${green}x-ui v${last_version}${plain} 安装完成，面板已启动，"
     echo -e ""
     echo -e "x-ui 管理脚本使用方法: "
@@ -198,6 +210,7 @@ install_x-ui() {
     echo -e "----------------------------------------------"
 }
 
+# 安装后配置
 config_after_install() {
     echo -e "${yellow}正在进行安装后配置...${plain}"
     
@@ -207,5 +220,6 @@ config_after_install() {
     echo -e "${green}配置完成！${plain}"
 }
 
+# 执行安装
 install_base
-install_x-ui $1
+install_x_ui $1

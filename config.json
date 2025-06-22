@@ -1,0 +1,40 @@
+{
+    "panel": {
+        "listen": ":54321",
+        "baseUrl": "",
+        "sessionMaxAge": 43200,
+        "pageSize": 20,
+        "session_timeout": 720,
+        "tcpport": 0,
+        "tls": false,
+        "certFile": "",
+        "keyFile": "",
+        "strictTransportSecurity": false,
+        "xFrameOptions": false,
+        "contentTypeNosniff": false,
+        "contentSecurityPolicy": false,
+        "referrerPolicy": false
+    },
+    "x25519_public_key": "",
+    "x25519_private_key": "",
+    "inbounds": [],
+    "users": [],
+    "webServer": {
+        "bind": "",
+        "certificateFile": "",
+        "keystoreFile": "",
+        "privateKeyFile": "",
+        "type": "NONE"
+    },
+    "db": {
+        "dbFile": "/etc/x-ui/x-ui.db"
+    },
+    "xrayAPI": {
+        "host": "127.0.0.1",
+        "port": 18888
+    },
+    "logs": {
+        "path": "/var/log/x-ui"
+    },
+    "language": "中文"
+}
