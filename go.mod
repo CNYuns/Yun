@@ -1,7 +1,3 @@
-// 国内用户建议设置 Go 模块代理以加速下载：
-// export GOPROXY=https://goproxy.cn,direct
-// export GOSUMDB=sum.golang.google.cn
-
 module x-ui
 
 go 1.24.3

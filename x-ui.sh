@@ -505,15 +505,14 @@ enable_bbr() {
 }
 
 update_shell() {
-    wget -O /usr/bin/x-ui -N https://github.com/MHSanaei/3x-ui/raw/main/x-ui.sh
+    wget -O /usr/bin/x-ui -N --no-check-certificate ${BASE_URL}/raw/main/x-ui.sh
     if [[ $? != 0 ]]; then
         echo ""
-        LOGE "Failed to download script, Please check whether the machine can connect Github"
-        before_show_menu
+        echo -e "${red}下载脚本失败，请检查本机能否连接 Gitee${plain}"
+        exit 1
     else
         chmod +x /usr/bin/x-ui
-        LOGI "Upgrade script succeeded, Please rerun the script"
-        before_show_menu
+        echo -e "${green}升级脚本成功，请重新运行脚本${plain}" && exit 0
     fi
 }
 
@@ -1709,7 +1708,7 @@ show_usage() {
 │  ${blue}x-ui settings${plain}     - Current Settings                 │
 │  ${blue}x-ui enable${plain}       - Enable Autostart on OS Startup   │
 │  ${blue}x-ui disable${plain}      - Disable Autostart on OS Startup  │
-│  ${blue}x-ui log${plain}          - Check logs                       │
+│  ${blue}x-ui log${plain}                   - Check logs                       │
 │  ${blue}x-ui banlog${plain}       - Check Fail2ban ban logs          │
 │  ${blue}x-ui update${plain}       - Update                           │
 │  ${blue}x-ui legacy${plain}       - legacy version                   │
@@ -1889,4 +1888,5 @@ if [[ $# > 0 ]]; then
     esac
 else
     show_menu
+fi
 fi

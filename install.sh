@@ -2,7 +2,6 @@
 
 red='\033[0;31m'
 green='\033[0;32m'
-blue='\033[0;34m'
 yellow='\033[0;33m'
 plain='\033[0m'
 
@@ -139,29 +138,19 @@ config_after_install() {
 }
 
 install_x-ui() {
-    cd /usr/local/    if [ $# == 0 ]; then
-        # 优先尝试从 Gitee 镜像源获取版本信息
-        tag_version=$(curl -Ls "https://gitee.com/api/v5/repos/YX-love/3x-ui/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    cd /usr/local/
+
+    if [ $# == 0 ]; then
+        tag_version=$(curl -Ls "https://api.github.com/repos/MHSanaei/3x-ui/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
         if [[ ! -n "$tag_version" ]]; then
-            echo -e "${yellow}从 Gitee 获取版本失败，尝试 GitHub...${plain}"
-            tag_version=$(curl -Ls "https://api.github.com/repos/MHSanaei/3x-ui/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-            if [[ ! -n "$tag_version" ]]; then
-                echo -e "${red}Failed to fetch x-ui version, it may be due to GitHub API restrictions, please try it later${plain}"
-                exit 1
-            fi
+            echo -e "${red}Failed to fetch x-ui version, it may be due to GitHub API restrictions, please try it later${plain}"
+            exit 1
         fi
         echo -e "Got x-ui latest version: ${tag_version}, beginning the installation..."
-        
-        # 优先从 Gitee 下载
-        echo -e "${green}正在从 Gitee 镜像源下载...${plain}"
-        wget -N -O /usr/local/x-ui-linux-$(arch).tar.gz "https://gitee.com/YX-love/3x-ui/releases/download/${tag_version}/x-ui-linux-$(arch).tar.gz"
+        wget -N -O /usr/local/x-ui-linux-$(arch).tar.gz https://github.com/MHSanaei/3x-ui/releases/download/${tag_version}/x-ui-linux-$(arch).tar.gz
         if [[ $? -ne 0 ]]; then
-            echo -e "${yellow}从 Gitee 下载失败，尝试 GitHub...${plain}"
-            wget -N -O /usr/local/x-ui-linux-$(arch).tar.gz https://github.com/MHSanaei/3x-ui/releases/download/${tag_version}/x-ui-linux-$(arch).tar.gz
-            if [[ $? -ne 0 ]]; then
-                echo -e "${red}Downloading x-ui failed, please be sure that your server can access GitHub ${plain}"
-                exit 1
-            fi
+            echo -e "${red}Downloading x-ui failed, please be sure that your server can access GitHub ${plain}"
+            exit 1
         fi
     else
         tag_version=$1
@@ -171,20 +160,14 @@ install_x-ui() {
         if [[ "$(printf '%s\n' "$min_version" "$tag_version_numeric" | sort -V | head -n1)" != "$min_version" ]]; then
             echo -e "${red}Please use a newer version (at least v2.3.5). Exiting installation.${plain}"
             exit 1
-        fi        url_gitee="https://gitee.com/YX-love/3x-ui/releases/download/${tag_version}/x-ui-linux-$(arch).tar.gz"
-        url_github="https://github.com/MHSanaei/3x-ui/releases/download/${tag_version}/x-ui-linux-$(arch).tar.gz"
+        fi
+
+        url="https://github.com/MHSanaei/3x-ui/releases/download/${tag_version}/x-ui-linux-$(arch).tar.gz"
         echo -e "Beginning to install x-ui $1"
-        
-        # 优先尝试从 Gitee 下载
-        echo -e "${green}正在从 Gitee 镜像源下载...${plain}"
-        wget -N -O /usr/local/x-ui-linux-$(arch).tar.gz ${url_gitee}
+        wget -N -O /usr/local/x-ui-linux-$(arch).tar.gz ${url}
         if [[ $? -ne 0 ]]; then
-            echo -e "${yellow}从 Gitee 下载失败，尝试 GitHub...${plain}"
-            wget -N -O /usr/local/x-ui-linux-$(arch).tar.gz ${url_github}
-            if [[ $? -ne 0 ]]; then
-                echo -e "${red}Download x-ui $1 failed, please check if the version exists ${plain}"
-                exit 1
-            fi
+            echo -e "${red}Download x-ui $1 failed, please check if the version exists ${plain}"
+            exit 1
         fi
     fi
 
@@ -202,20 +185,11 @@ install_x-ui() {
     if [[ $(arch) == "armv5" || $(arch) == "armv6" || $(arch) == "armv7" ]]; then
         mv bin/xray-linux-$(arch) bin/xray-linux-arm
         chmod +x bin/xray-linux-arm
-    fi    chmod +x x-ui bin/xray-linux-$(arch)
-    cp -f x-ui.service /etc/systemd/system/
-    
-    # 优先从 Gitee 下载管理脚本
-    echo -e "${green}正在下载管理脚本...${plain}"
-    wget -O /usr/bin/x-ui https://gitee.com/YX-love/3x-ui/raw/master/x-ui-cn.sh
-    if [[ $? -ne 0 ]]; then
-        echo -e "${yellow}从 Gitee 下载管理脚本失败，尝试 GitHub...${plain}"
-        wget -O /usr/bin/x-ui https://raw.githubusercontent.com/MHSanaei/3x-ui/main/x-ui.sh
-        if [[ $? -ne 0 ]]; then
-            echo -e "${yellow}下载管理脚本失败，使用本地脚本${plain}"
-            cp -f x-ui.sh /usr/bin/x-ui
-        fi
     fi
+
+    chmod +x x-ui bin/xray-linux-$(arch)
+    cp -f x-ui.service /etc/systemd/system/
+    wget -O /usr/bin/x-ui https://raw.githubusercontent.com/MHSanaei/3x-ui/main/x-ui.sh
     chmod +x /usr/local/x-ui/x-ui.sh
     chmod +x /usr/bin/x-ui
     config_after_install
@@ -247,4 +221,5 @@ install_x-ui() {
 
 echo -e "${green}Running...${plain}"
 install_base
+install_x-ui $1
 install_x-ui $1

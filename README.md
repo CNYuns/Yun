@@ -1,70 +1,141 @@
-[English](/README.md) | [فارسی](/README.fa_IR.md) | [العربية](/README.ar_EG.md) |  [中文](/README.zh_CN.md) | [Español](/README.es_ES.md) | [Русский](/README.ru_RU.md)
+# 3X-UI 管理面板
 
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./media/3x-ui-dark.png">
-    <img alt="3x-ui" src="./media/3x-ui-light.png">
-  </picture>
-</p>
+> **免责声明：此项目仅供个人学习交流使用，请勿用于商业用途，请勿用于非法用途，否则后果自负，请在下载后24小时内删除，谢谢合作！**
 
-[![Release](https://img.shields.io/badge/release-v2.6.0-blue.svg?style=for-the-badge)](https://gitee.com/YX-love/3x-ui/releases)
-[![License](https://img.shields.io/badge/license-GPL%20V3-blue.svg?longCache=true&style=for-the-badge)](https://www.gnu.org/licenses/gpl-3.0.en.html)
-[![Gitee Stars](https://gitee.com/YX-love/3x-ui/badge/star.svg?theme=dark)](https://gitee.com/YX-love/3x-ui/stargazers)
-[![Gitee Forks](https://gitee.com/YX-love/3x-ui/badge/fork.svg?theme=dark)](https://gitee.com/YX-love/3x-ui/members)
+一个基于 Web 的 Xray 管理面板，支持多协议、多用户的代理管理系统。
 
-**3X-UI** — 基于 Xray-core 的高级开源网页控制面板，为管理各种 VPN 和代理协议提供了用户友好的界面。
+[English](README_EN.md)
 
-> [!IMPORTANT]
-> 本项目仅供个人学习和研究使用，请勿用于非法用途，请勿在生产环境中使用。
+## 功能特性
 
-作为原版 X-UI 项目的增强分支，3X-UI 提供了更好的稳定性、更广泛的协议支持和附加功能。
+- **系统状态监控** - CPU、内存、系统负载、网络状态
+- **支持多协议** - VMess、VLESS、Trojan、Shadowsocks、Dokodemo-door、Socks、HTTP
+- **支持多种传输配置**
+- **流量统计** - 支持在线用户统计，多用户流量统计
+- **日志监控** - 观察传输日志
+- **数据库** - 支持 SQLite/MySQL/PostgreSQL
+- **TLS 证书管理** - SSL 证书申请和续签
+- **Telegram Bot** - 支持每日流量报告、面板登录提醒
+- **备份恢复** - 支持面板设置及 Xray 配置导入导出
 
-> [!NOTE]
-> 本版本针对国内网络环境进行了优化，提供稳定的国内镜像源和加速下载。
+## 安装和升级
 
-## 项目源码
-
-- **原版项目**: [MHSanaei/3x-ui](https://github.com/MHSanaei/3x-ui)
-- **国内镜像**: [YX-love/3x-ui](https://gitee.com/YX-love/3x-ui)
-
-## 快速开始
+### 一键安装脚本
 
 ```bash
-bash <(curl -Ls https://gitee.com/YX-love/3x-ui/raw/master/install.sh)
+bash <(curl -Ls https://gitee.com/YX-love/3x-ui/raw/main/install.sh)
 ```
 
-**国内用户推荐使用以下命令（使用 Gitee 镜像源）：**
+### 一键升级脚本
 
 ```bash
-bash <(curl -Ls https://gitee.com/YX-love/3x-ui/raw/master/install-cn.sh)
+bash <(curl -Ls https://gitee.com/YX-love/3x-ui/raw/main/install.sh) update
 ```
 
-完整文档请访问 [项目文档](https://gitee.com/YX-love/3x-ui/wikis)。
+### 手动安装
 
-## 特别感谢
+1. 下载最新版本的压缩包：https://gitee.com/YX-love/3x-ui/releases
+2. 一般选择 `amd64` 架构
+3. 解压并安装
 
-- [alireza0](https://github.com/alireza0/)
-- [MHSanaei](https://github.com/MHSanaei/) - 原版 3X-UI 项目维护者
+```bash
+cd /root/
+wget https://gitee.com/YX-love/3x-ui/releases/download/v2.6.0/x-ui-linux-amd64.tar.gz
+tar zxvf x-ui-linux-amd64.tar.gz
+chmod +x x-ui/x-ui x-ui/bin/xray-linux-* x-ui/x-ui.sh
+cp x-ui/x-ui.sh /usr/bin/x-ui
+cp -f x-ui/x-ui.service /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable x-ui
+systemctl start x-ui
+```
 
-## 致谢
+## 默认设置
 
-- [Iran v2ray rules](https://github.com/chocolate4u/Iran-v2ray-rules) (License: **GPL-3.0**): _增强的 v2ray/xray 和 v2ray/xray-clients 路由规则，内置伊朗域名，专注于安全和广告拦截。_
-- [Russia v2ray rules](https://github.com/runetfreedom/russia-v2ray-rules-dat) (License: **GPL-3.0**): _该仓库包含基于俄罗斯被屏蔽域名和地址数据的自动更新 V2Ray 路由规则。_
+- **端口：** 54321
+- **用户名和密码：** 登录面板后设置
+- **数据库：** SQLite3
+- **Xray 版本：** 最新版本
+- **证书申请：** ACME v2
 
-## 支持项目
+安装完成后，请使用 `x-ui` 命令打开控制菜单。
 
-**如果这个项目对您有帮助，请给它一个**:star2:
+## 建议系统
 
-<p align="left">
-  <a href="https://buymeacoffee.com/mhsanaei" target="_blank">
-    <img src="./media/buymeacoffe.png" alt="Image">
-  </a>
-</p>
+- CentOS 8+
+- Ubuntu 20+
+- Debian 11+
+- Fedora 36+
+- Arch Linux
+- Parch Linux
+- Manjaro
+- Armbian
+- AlmaLinux 9+
+- Rocky Linux 9+
+- Oracle Linux 8+
+- OpenSUSE Tumbleweed
 
-- USDT (TRC20): `TXncxkvhkDWGts487Pjqq1qT9JmwRUz8CC`
-- MATIC (polygon): `0x41C9548675D044c6Bfb425786C765bc37427256A`
-- LTC (Litecoin): `ltc1q2ach7x6d2zq0n4l0t4zl7d7xe2s6fs7a3vspwv`
+## 架构支持
 
-## Stargazers over Time
+- amd64
+- arm64
+- armv7
 
-[![Stargazers over time](https://starchart.cc/MHSanaei/3x-ui.svg?variant=adaptive)](https://starchart.cc/MHSanaei/3x-ui)
+## 常用命令
+
+```bash
+x-ui              # 显示管理菜单
+x-ui start        # 启动 x-ui 面板
+x-ui stop         # 停止 x-ui 面板
+x-ui restart      # 重启 x-ui 面板
+x-ui status       # 查看 x-ui 状态
+x-ui enable       # 设置 x-ui 开机自启
+x-ui disable      # 取消 x-ui 开机自启
+x-ui log          # 查看 x-ui 日志
+x-ui update       # 更新 x-ui 面板
+x-ui install      # 安装 x-ui 面板
+x-ui uninstall    # 卸载 x-ui 面板
+```
+
+## API 接口
+
+面板提供了一套 RESTful API，可以通过 HTTP 请求与面板进行交互。
+
+API 文档：[API.md](docs/API.md)
+
+## 环境变量
+
+| 变量名 | 类型 | 默认值 | 描述 |
+|--------|------|--------|------|
+| XUI_LOG_LEVEL | string | info | 日志级别: `debug`, `info`, `warn`, `error` |
+| XUI_DEBUG | boolean | false | 调试模式 |
+| XUI_BIN_FOLDER | string | bin | xray 核心的文件夹 |
+| XUI_DB_FOLDER | string | /etc/x-ui | 数据库文件夹 |
+
+## 问题反馈
+
+如果您在使用过程中遇到问题，请通过以下方式反馈：
+
+- [Issues](https://gitee.com/YX-love/3x-ui/issues)
+
+## 感谢
+
+- [vaxilu/x-ui](https://github.com/vaxilu/x-ui)
+- [XTLS/Xray-core](https://github.com/XTLS/Xray-core)
+- [gin-gonic/gin](https://github.com/gin-gonic/gin)
+
+## 开源协议
+
+[GPL v3](https://gitee.com/YX-love/3x-ui/blob/main/LICENSE)
+
+## 捐赠
+
+如果您觉得这个项目对您有帮助，可以请作者喝杯咖啡 ☕
+
+### 支付宝
+[捐赠二维码]
+
+### 微信支付
+[捐赠二维码]
+
+感谢您的支持！

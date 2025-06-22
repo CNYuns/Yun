@@ -624,3 +624,7 @@ func (s *SettingService) GetDefaultSettings(host string) (any, error) {
 
 	return result, nil
 }
+
+const (
+	REPO_URL = "https://gitee.com/YX-love/3x-ui"
+)
