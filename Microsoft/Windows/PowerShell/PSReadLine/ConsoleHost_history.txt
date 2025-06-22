@@ -1,0 +1,2 @@
+cd "c:\Users\小明\Documents\3x-ui" && chmod +x install-cn.sh x-ui-cn.sh docker-deploy-cn.sh
+cd "c:\Users\小明\Documents\3x-ui"

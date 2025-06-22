@@ -1,0 +1,35 @@
+services:
+  3xui:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.cn
+    container_name: 3xui_app_cn
+    hostname: 3xui-cn
+    volumes:
+      - $PWD/db/:/etc/x-ui/
+      - $PWD/cert/:/root/cert/
+      - $PWD/logs/:/var/log/
+    environment:
+      XRAY_VMESS_AEAD_FORCED: "false"
+      XUI_ENABLE_FAIL2BAN: "true"
+      TZ: "Asia/Shanghai"
+      LANG: "zh_CN.UTF-8"
+      # Go 代理设置
+      GOPROXY: "https://goproxy.cn,direct"
+      GOSUMDB: "sum.golang.google.cn"
+    tty: true
+    network_mode: host
+    restart: unless-stopped
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:54321/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    # 资源限制
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M

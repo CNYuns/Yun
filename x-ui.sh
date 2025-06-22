@@ -74,7 +74,7 @@ before_show_menu() {
 }
 
 install() {
-    bash <(curl -Ls https://gitee.com/YX-love/3x-ui/raw/main/install.sh)
+    bash <(curl -Ls https://raw.githubusercontent.com/MHSanaei/3x-ui/main/install.sh)
     if [[ $? == 0 ]]; then
         if [[ $# == 0 ]]; then
             start
@@ -93,7 +93,7 @@ update() {
         fi
         return 0
     fi
-    bash <(curl -Ls https://gitee.com/YX-love/3x-ui/raw/main/install.sh)
+    bash <(curl -Ls https://raw.githubusercontent.com/MHSanaei/3x-ui/main/install.sh)
     if [[ $? == 0 ]]; then
         LOGI "Update is complete, Panel has automatically restarted "
         before_show_menu
@@ -111,7 +111,7 @@ update_menu() {
         return 0
     fi
 
-    wget -O /usr/bin/x-ui https://gitee.com/YX-love/3x-ui/raw/main/x-ui.sh
+    wget -O /usr/bin/x-ui https://raw.githubusercontent.com/MHSanaei/3x-ui/main/x-ui.sh
     chmod +x /usr/local/x-ui/x-ui.sh
     chmod +x /usr/bin/x-ui
 
@@ -133,7 +133,7 @@ legacy_version() {
         exit 1
     fi
     # Use the entered panel version in the download link
-    install_command="bash <(curl -Ls "https://gitee.com/YX-love/3x-ui/raw/v$tag_version/install.sh") v$tag_version"
+    install_command="bash <(curl -Ls "https://raw.githubusercontent.com/mhsanaei/3x-ui/v$tag_version/install.sh") v$tag_version"
 
     echo "Downloading and installing panel version $tag_version..."
     eval $install_command
@@ -164,7 +164,7 @@ uninstall() {
     echo ""
     echo -e "Uninstalled Successfully.\n"
     echo "If you need to install this panel again, you can use below command:"
-    echo -e "${green}bash <(curl -Ls https://gitee.com/YX-love/3x-ui/raw/main/install.sh)${plain}"
+    echo -e "${green}bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)${plain}"
     echo ""
     # Trap the SIGTERM signal
     trap delete_script SIGTERM
@@ -505,7 +505,7 @@ enable_bbr() {
 }
 
 update_shell() {
-    wget -O /usr/bin/x-ui -N https://gitee.com/YX-love/3x-ui/raw/main/x-ui.sh
+    wget -O /usr/bin/x-ui -N https://github.com/MHSanaei/3x-ui/raw/main/x-ui.sh
     if [[ $? != 0 ]]; then
         echo ""
         LOGE "Failed to download script, Please check whether the machine can connect Github"
@@ -819,24 +819,24 @@ update_geo() {
     1)
         systemctl stop x-ui
         rm -f geoip.dat geosite.dat
-        wget -N https://gitee.com/YX-love/3x-ui/raw/main/geoip.dat
-        wget -N https://gitee.com/YX-love/3x-ui/raw/main/geosite.dat
+        wget -N https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat
+        wget -N https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
         echo -e "${green}Loyalsoldier datasets have been updated successfully!${plain}"
         restart
         ;;
     2)
         systemctl stop x-ui
         rm -f geoip_IR.dat geosite_IR.dat
-        wget -O geoip_IR.dat -N https://gitee.com/YX-love/3x-ui/raw/main/geoip_IR.dat
-        wget -O geosite_IR.dat -N https://gitee.com/YX-love/3x-ui/raw/main/geosite_IR.dat
+        wget -O geoip_IR.dat -N https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geoip.dat
+        wget -O geosite_IR.dat -N https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geosite.dat
         echo -e "${green}chocolate4u datasets have been updated successfully!${plain}"
         restart
         ;;
     3)
         systemctl stop x-ui
         rm -f geoip_RU.dat geosite_RU.dat
-        wget -O geoip_RU.dat -N https://gitee.com/YX-love/3x-ui/raw/main/geoip_RU.dat
-        wget -O geosite_RU.dat -N https://gitee.com/YX-love/3x-ui/raw/main/geosite_RU.dat
+        wget -O geoip_RU.dat -N https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geoip.dat
+        wget -O geosite_RU.dat -N https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat
         echo -e "${green}runetfreedom datasets have been updated successfully!${plain}"
         restart
         ;;
@@ -1698,63 +1698,63 @@ SSH_port_forwarding() {
 }
 
 show_usage() {
-    echo -e "┌───────────────────────────────────────────────────────�?
-�? ${blue}x-ui control menu usages (subcommands):${plain}              �?
-�?                                                      �?
-�? ${blue}x-ui${plain}              - Admin Management Script          �?
-�? ${blue}x-ui start${plain}        - Start                            �?
-�? ${blue}x-ui stop${plain}         - Stop                             �?
-�? ${blue}x-ui restart${plain}      - Restart                          �?
-�? ${blue}x-ui status${plain}       - Current Status                   �?
-�? ${blue}x-ui settings${plain}     - Current Settings                 �?
-�? ${blue}x-ui enable${plain}       - Enable Autostart on OS Startup   �?
-�? ${blue}x-ui disable${plain}      - Disable Autostart on OS Startup  �?
-�? ${blue}x-ui log${plain}          - Check logs                       �?
-�? ${blue}x-ui banlog${plain}       - Check Fail2ban ban logs          �?
-�? ${blue}x-ui update${plain}       - Update                           �?
-�? ${blue}x-ui legacy${plain}       - legacy version                   �?
-�? ${blue}x-ui install${plain}      - Install                          �?
-�? ${blue}x-ui uninstall${plain}    - Uninstall                        �?
-└───────────────────────────────────────────────────────�?
+    echo -e "┌───────────────────────────────────────────────────────┐
+│  ${blue}x-ui control menu usages (subcommands):${plain}              │
+│                                                       │
+│  ${blue}x-ui${plain}              - Admin Management Script          │
+│  ${blue}x-ui start${plain}        - Start                            │
+│  ${blue}x-ui stop${plain}         - Stop                             │
+│  ${blue}x-ui restart${plain}      - Restart                          │
+│  ${blue}x-ui status${plain}       - Current Status                   │
+│  ${blue}x-ui settings${plain}     - Current Settings                 │
+│  ${blue}x-ui enable${plain}       - Enable Autostart on OS Startup   │
+│  ${blue}x-ui disable${plain}      - Disable Autostart on OS Startup  │
+│  ${blue}x-ui log${plain}          - Check logs                       │
+│  ${blue}x-ui banlog${plain}       - Check Fail2ban ban logs          │
+│  ${blue}x-ui update${plain}       - Update                           │
+│  ${blue}x-ui legacy${plain}       - legacy version                   │
+│  ${blue}x-ui install${plain}      - Install                          │
+│  ${blue}x-ui uninstall${plain}    - Uninstall                        │
+└───────────────────────────────────────────────────────┘"
 }
 
 show_menu() {
     echo -e "
-╔────────────────────────────────────────────────�?
-�?  ${green}3X-UI Panel Management Script${plain}                �?
-�?  ${green}0.${plain} Exit Script                               �?
-│────────────────────────────────────────────────�?
-�?  ${green}1.${plain} Install                                   �?
-�?  ${green}2.${plain} Update                                    �?
-�?  ${green}3.${plain} Update Menu                               �?
-�?  ${green}4.${plain} Legacy Version                            �?
-�?  ${green}5.${plain} Uninstall                                 �?
-│────────────────────────────────────────────────�?
-�?  ${green}6.${plain} Reset Username & Password                 �?
-�?  ${green}7.${plain} Reset Web Base Path                       �?
-�?  ${green}8.${plain} Reset Settings                            �?
-�?  ${green}9.${plain} Change Port                               �?
-�? ${green}10.${plain} View Current Settings                     �?
-│────────────────────────────────────────────────�?
-�? ${green}11.${plain} Start                                     �?
-�? ${green}12.${plain} Stop                                      �?
-�? ${green}13.${plain} Restart                                   �?
-�? ${green}14.${plain} Check Status                              �?
-�? ${green}15.${plain} Logs Management                           �?
-│────────────────────────────────────────────────�?
-�? ${green}16.${plain} Enable Autostart                          �?
-�? ${green}17.${plain} Disable Autostart                         �?
-│────────────────────────────────────────────────�?
-�? ${green}18.${plain} SSL Certificate Management                �?
-�? ${green}19.${plain} Cloudflare SSL Certificate                �?
-�? ${green}20.${plain} IP Limit Management                       �?
-�? ${green}21.${plain} Firewall Management                       �?
-�? ${green}22.${plain} SSH Port Forwarding Management            �?
-│────────────────────────────────────────────────�?
-�? ${green}23.${plain} Enable BBR                                �?
-�? ${green}24.${plain} Update Geo Files                          �?
-�? ${green}25.${plain} Speedtest by Ookla                        �?
-╚────────────────────────────────────────────────�?
+╔────────────────────────────────────────────────╗
+│   ${green}3X-UI Panel Management Script${plain}                │
+│   ${green}0.${plain} Exit Script                               │
+│────────────────────────────────────────────────│
+│   ${green}1.${plain} Install                                   │
+│   ${green}2.${plain} Update                                    │
+│   ${green}3.${plain} Update Menu                               │
+│   ${green}4.${plain} Legacy Version                            │
+│   ${green}5.${plain} Uninstall                                 │
+│────────────────────────────────────────────────│
+│   ${green}6.${plain} Reset Username & Password                 │
+│   ${green}7.${plain} Reset Web Base Path                       │
+│   ${green}8.${plain} Reset Settings                            │
+│   ${green}9.${plain} Change Port                               │
+│  ${green}10.${plain} View Current Settings                     │
+│────────────────────────────────────────────────│
+│  ${green}11.${plain} Start                                     │
+│  ${green}12.${plain} Stop                                      │
+│  ${green}13.${plain} Restart                                   │
+│  ${green}14.${plain} Check Status                              │
+│  ${green}15.${plain} Logs Management                           │
+│────────────────────────────────────────────────│
+│  ${green}16.${plain} Enable Autostart                          │
+│  ${green}17.${plain} Disable Autostart                         │
+│────────────────────────────────────────────────│
+│  ${green}18.${plain} SSL Certificate Management                │
+│  ${green}19.${plain} Cloudflare SSL Certificate                │
+│  ${green}20.${plain} IP Limit Management                       │
+│  ${green}21.${plain} Firewall Management                       │
+│  ${green}22.${plain} SSH Port Forwarding Management            │
+│────────────────────────────────────────────────│
+│  ${green}23.${plain} Enable BBR                                │
+│  ${green}24.${plain} Update Geo Files                          │
+│  ${green}25.${plain} Speedtest by Ookla                        │
+╚────────────────────────────────────────────────╝
 "
     show_status
     echo && read -rp "Please enter your selection [0-25]: " num

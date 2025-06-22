@@ -259,7 +259,7 @@ func (s *ServerService) GetStatus(lastStatus *Status) *Status {
 
 func (s *ServerService) GetXrayVersions() ([]string, error) {
 	const (
-		XrayURL    = "https://gitee.com/api/v5/repos/YX-love/3x-ui/releases"
+		XrayURL    = "https://api.github.com/repos/XTLS/Xray-core/releases"
 		bufferSize = 8192
 	)
 
@@ -348,7 +348,7 @@ func (s *ServerService) downloadXRay(version string) (string, error) {
 	}
 
 	fileName := fmt.Sprintf("Xray-%s-%s.zip", osName, arch)
-	url := fmt.Sprintf("https://gitee.com/YX-love/3x-ui/releases/download/%s/%s", version, fileName)
+	url := fmt.Sprintf("https://github.com/XTLS/Xray-core/releases/download/%s/%s", version, fileName)
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", err
@@ -603,12 +603,12 @@ func (s *ServerService) UpdateGeofile(fileName string) error {
 		URL      string
 		FileName string
 	}{
-		{"https://gitee.com/YX-love/3x-ui/raw/main/geoip.dat", "geoip.dat"},
-		{"https://gitee.com/YX-love/3x-ui/raw/main/geosite.dat", "geosite.dat"},
-		{"https://gitee.com/YX-love/3x-ui/raw/main/geoip_IR.dat", "geoip_IR.dat"},
-		{"https://gitee.com/YX-love/3x-ui/raw/main/geosite_IR.dat", "geosite_IR.dat"},
-		{"https://gitee.com/YX-love/3x-ui/raw/main/geoip_RU.dat", "geoip_RU.dat"},
-		{"https://gitee.com/YX-love/3x-ui/raw/main/geosite_RU.dat", "geosite_RU.dat"},
+		{"https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat", "geoip.dat"},
+		{"https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat", "geosite.dat"},
+		{"https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geoip.dat", "geoip_IR.dat"},
+		{"https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geosite.dat", "geosite_IR.dat"},
+		{"https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geoip.dat", "geoip_RU.dat"},
+		{"https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat", "geosite_RU.dat"},
 	}
 
 	downloadFile := func(url, destPath string) error {
