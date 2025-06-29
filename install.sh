@@ -76,6 +76,28 @@ gen_random_path() {
     gen_random_string 8
 }
 
+# 获取服务器公网IP地址
+get_server_ip() {
+    local ip=""
+    # 尝试多种获取公网IP的方法
+    ip=$(curl -s https://api.ipify.org || 
+         curl -s https://ipinfo.io/ip || 
+         curl -s https://api.ip.sb/ip || 
+         curl -s https://ifconfig.me/ip)
+    
+    if [[ -z "$ip" ]]; then
+        # 如果无法获取公网IP，尝试获取本地IP
+        ip=$(hostname -I | awk '{print $1}')
+    fi
+    
+    if [[ -z "$ip" ]]; then
+        # 如果仍然无法获取IP，返回占位符
+        ip="您的服务器IP"
+    fi
+    
+    echo "$ip"
+}
+
 # 生成随机安全参数
 PANEL_PORT=$(gen_random_port)
 PANEL_USER=$(gen_random_username)
@@ -169,7 +191,10 @@ check_status() {
 
 # 安装x-ui面板
 install_x_ui() {
-    systemctl stop x-ui
+    # 检查服务是否存在，存在则停止
+    if [ -f /etc/systemd/system/x-ui.service ]; then
+        systemctl stop x-ui
+    fi
     cd /usr/local/
 
     if [ $# == 0 ]; then
@@ -279,9 +304,13 @@ EOF
     # 显示安装信息
     echo -e "${green}x-ui ${last_version}${plain} 安装完成，面板已启动"
     echo -e ""
+    
+    # 获取服务器IP地址
+    SERVER_IP=$(get_server_ip)
+    
     echo -e "面板访问信息如下(请妥善保存):"
     echo -e "------------------------"
-    echo -e "面板地址: ${green}http://服务器IP:${PANEL_PORT}${PANEL_PATH}${plain}"
+    echo -e "面板地址: ${green}http://${SERVER_IP}:${PANEL_PORT}${PANEL_PATH}${plain}"
     echo -e "用户名: ${green}${PANEL_USER}${plain}"
     echo -e "密码: ${green}${PANEL_PASS}${plain}"
     echo -e "------------------------"
