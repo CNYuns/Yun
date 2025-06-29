@@ -244,50 +244,6 @@ install_x_ui() {
     mkdir -p /etc/x-ui
     mkdir -p /var/log/x-ui
     
-    # 创建安全配置文件（使用随机端口和路径）
-    cat > /usr/local/x-ui/config.json << EOF
-{
-    "panel": {
-        "listen": ":${PANEL_PORT}",
-        "baseUrl": "${PANEL_PATH}",
-        "sessionMaxAge": 43200,
-        "pageSize": 20,
-        "session_timeout": 720,
-        "tcpport": 0,
-        "tls": false,
-        "certFile": "",
-        "keyFile": "",
-        "strictTransportSecurity": false,
-        "xFrameOptions": false,
-        "contentTypeNosniff": false,
-        "contentSecurityPolicy": false,
-        "referrerPolicy": false
-    },
-    "x25519_public_key": "",
-    "x25519_private_key": "",
-    "inbounds": [],
-    "users": [],
-    "webServer": {
-        "bind": "",
-        "certificateFile": "",
-        "keystoreFile": "",
-        "privateKeyFile": "",
-        "type": "NONE"
-    },
-    "db": {
-        "dbFile": "/etc/x-ui/x-ui.db"
-    },
-    "xrayAPI": {
-        "host": "127.0.0.1",
-        "port": 18888
-    },
-    "logs": {
-        "path": "/var/log/x-ui"
-    },
-    "language": "中文"
-}
-EOF
-    
     # 下载管理脚本
     wget --no-check-certificate -O /usr/bin/x-ui https://gitee.com/YX-love/3x-ui/raw/master/x-ui.sh
     chmod +x /usr/local/x-ui/x-ui.sh
@@ -300,6 +256,27 @@ EOF
     systemctl daemon-reload
     systemctl enable x-ui
     systemctl start x-ui
+    
+    # 等待服务启动
+    sleep 3
+    
+    # 验证配置是否正确设置
+    echo -e "${yellow}正在验证配置...${plain}"
+    ACTUAL_CONFIG=$(/usr/local/x-ui/x-ui setting -show 2>/dev/null)
+    
+    # 从配置输出中提取实际的端口和路径
+    if [[ -n "$ACTUAL_CONFIG" ]]; then
+        ACTUAL_PORT=$(echo "$ACTUAL_CONFIG" | grep "port:" | awk '{print $2}')
+        ACTUAL_PATH=$(echo "$ACTUAL_CONFIG" | grep "webBasePath:" | awk '{print $2}')
+        
+        # 如果提取成功，使用实际值；否则使用预设值
+        if [[ -n "$ACTUAL_PORT" ]]; then
+            PANEL_PORT="$ACTUAL_PORT"
+        fi
+        if [[ -n "$ACTUAL_PATH" ]]; then
+            PANEL_PATH="$ACTUAL_PATH"
+        fi
+    fi
     
     # 显示安装信息
     echo -e "${green}x-ui ${last_version}${plain} 安装完成，面板已启动"
@@ -337,10 +314,10 @@ EOF
 config_after_install() {
     echo -e "${yellow}正在进行安装后配置...${plain}"
     
-    # 运行x-ui命令设置随机用户名和密码
-    /usr/local/x-ui/x-ui setting -username ${PANEL_USER} -password ${PANEL_PASS}
+    # 运行x-ui命令设置随机用户名、密码、端口和路径
+    /usr/local/x-ui/x-ui setting -username ${PANEL_USER} -password ${PANEL_PASS} -port ${PANEL_PORT} -webBasePath ${PANEL_PATH}
     
-    echo -e "${green}面板账号密码设置成功！${plain}"
+    echo -e "${green}面板配置设置成功！${plain}"
 }
 
 # 执行安装
