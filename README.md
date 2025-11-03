@@ -4,7 +4,7 @@
 
 > **注意**: 本仓库是 [MHSanaei/3x-ui](https://github.com/MHSanaei/3x-ui) 的国内优化版本，已针对国内网络环境进行优化
 
-具体的使用请参考GitHub原版！当前版本为 v2.6.0，文档更新时间 2025.11.3
+具体的使用请参考GitHub原版！当前版本为 v2.6.1，文档更新时间 2025.11.3
 
 3x-ui 是一个支持多协议多用户的 xray 面板，支持 V2ay、Trojan、Shadowsocks 等协议。
 

@@ -199,7 +199,7 @@ install_x_ui() {
 
     if [ $# == 0 ]; then
         # 获取最新版本号（使用可靠的方式）
-        last_version="v2.6.0"
+        last_version="v2.6.1"
         echo -e "开始安装 x-ui ${last_version}"
         
         # 下载最新版本
