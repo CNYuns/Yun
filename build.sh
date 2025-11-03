@@ -66,12 +66,12 @@ download_xray_and_geo() {
     esac
 
     # 下载 Xray
-    wget -q ${XRAY_URL}${xray_file} || {
+    if ! wget -q "${XRAY_URL}${xray_file}"; then
         echo -e "${RED}✗ 下载 Xray 失败${NC}"
         return 1
-    }
-    unzip -q ${xray_file}
-    rm -f ${xray_file}
+    fi
+    unzip -q "${xray_file}"
+    rm -f "${xray_file}"
 
     # 下载 geo 文件（所有平台共用）
     echo -e "${YELLOW}下载 geo 数据库文件...${NC}"

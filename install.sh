@@ -12,17 +12,17 @@ plain='\033[0m'
 # 检查系统类型
 if [[ -f /etc/redhat-release ]]; then
     release="centos"
-elif cat /etc/issue | grep -Eqi "debian"; then
+elif grep -Eqi "debian" /etc/issue; then
     release="debian"
-elif cat /etc/issue | grep -Eqi "ubuntu"; then
+elif grep -Eqi "ubuntu" /etc/issue; then
     release="ubuntu"
-elif cat /etc/issue | grep -Eqi "centos|red hat|redhat"; then
+elif grep -Eqi "centos|red hat|redhat" /etc/issue; then
     release="centos"
-elif cat /proc/version | grep -Eqi "debian"; then
+elif grep -Eqi "debian" /proc/version; then
     release="debian"
-elif cat /proc/version | grep -Eqi "ubuntu"; then
+elif grep -Eqi "ubuntu" /proc/version; then
     release="ubuntu"
-elif cat /proc/version | grep -Eqi "centos|red hat|redhat"; then
+elif grep -Eqi "centos|red hat|redhat" /proc/version; then
     release="centos"
 else
     echo -e "${red}未检测到系统版本，请联系开发者！${plain}\n" && exit 1
@@ -52,13 +52,13 @@ fi
 
 # 随机生成端口（10000-65000之间）
 gen_random_port() {
-    echo $(shuf -i 10000-65000 -n 1)
+    shuf -i 10000-65000 -n 1
 }
 
 # 生成随机字符串
 gen_random_string() {
-    length=$1
-    cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w $length | head -n 1
+    local length=$1
+    tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w "${length}" | head -n 1
 }
 
 # 生成随机用户名（8位字符）
