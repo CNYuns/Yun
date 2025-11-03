@@ -1,11 +1,13 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"text/template"
 	"time"
 
 	"x-ui/logger"
+	"x-ui/web/middleware"
 	"x-ui/web/service"
 	"x-ui/web/session"
 
@@ -25,10 +27,14 @@ type IndexController struct {
 	settingService service.SettingService
 	userService    service.UserService
 	tgbot          service.Tgbot
+	rateLimiter    *middleware.LoginRateLimiter
 }
 
 func NewIndexController(g *gin.RouterGroup) *IndexController {
-	a := &IndexController{}
+	a := &IndexController{
+		// 5 attempts per 15 minutes, block for 15 minutes
+		rateLimiter: middleware.NewLoginRateLimiter(5, 15*time.Minute, 15*time.Minute),
+	}
 	a.initRouter(g)
 	return a
 }
@@ -49,6 +55,16 @@ func (a *IndexController) index(c *gin.Context) {
 }
 
 func (a *IndexController) login(c *gin.Context) {
+	clientIP := c.ClientIP()
+
+	// Check if IP is blocked
+	if blocked, remaining := a.rateLimiter.IsBlocked(clientIP); blocked {
+		pureJsonMsg(c, http.StatusTooManyRequests, false,
+			I18nWeb(c, "pages.login.toasts.tooManyAttempts") +
+			" Please try again in " + formatDuration(remaining))
+		return
+	}
+
 	var form LoginForm
 
 	if err := c.ShouldBind(&form); err != nil {
@@ -67,14 +83,19 @@ func (a *IndexController) login(c *gin.Context) {
 	user := a.userService.CheckUser(form.Username, form.Password, form.TwoFactorCode)
 	timeStr := time.Now().Format("2006-01-02 15:04:05")
 	safeUser := template.HTMLEscapeString(form.Username)
-	safePass := template.HTMLEscapeString(form.Password)
 
 	if user == nil {
-		logger.Warningf("wrong username: \"%s\", password: \"%s\", IP: \"%s\"", safeUser, safePass, getRemoteIp(c))
-		a.tgbot.UserLoginNotify(safeUser, safePass, getRemoteIp(c), timeStr, 0)
+		// Record failed attempt
+		a.rateLimiter.RecordAttempt(clientIP, false)
+
+		logger.Warningf("wrong username: \"%s\", IP: \"%s\"", safeUser, getRemoteIp(c))
+		a.tgbot.UserLoginNotify(safeUser, ``, getRemoteIp(c), timeStr, 0)
 		pureJsonMsg(c, http.StatusOK, false, I18nWeb(c, "pages.login.toasts.wrongUsernameOrPassword"))
 		return
 	}
+
+	// Record successful attempt
+	a.rateLimiter.RecordAttempt(clientIP, true)
 
 	logger.Infof("%s logged in successfully, Ip Address: %s\n", safeUser, getRemoteIp(c))
 	a.tgbot.UserLoginNotify(safeUser, ``, getRemoteIp(c), timeStr, 1)
@@ -93,6 +114,16 @@ func (a *IndexController) login(c *gin.Context) {
 
 	logger.Infof("%s logged in successfully", safeUser)
 	jsonMsg(c, I18nWeb(c, "pages.login.toasts.successLogin"), nil)
+}
+
+// Helper function to format duration
+func formatDuration(d time.Duration) string {
+	minutes := int(d.Minutes())
+	seconds := int(d.Seconds()) % 60
+	if minutes > 0 {
+		return fmt.Sprintf("%d minutes %d seconds", minutes, seconds)
+	}
+	return fmt.Sprintf("%d seconds", seconds)
 }
 
 func (a *IndexController) logout(c *gin.Context) {

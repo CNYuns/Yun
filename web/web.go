@@ -158,6 +158,9 @@ func (s *Server) initRouter() (*gin.Engine, error) {
 
 	engine := gin.Default()
 
+	// Add security headers middleware
+	engine.Use(middleware.SecurityHeaders())
+
 	webDomain, err := s.settingService.GetWebDomain()
 	if err != nil {
 		return nil, err

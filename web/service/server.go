@@ -426,10 +426,23 @@ func (s *ServerService) UpdateXray(version string) error {
 }
 
 func (s *ServerService) GetLogs(count string, level string, syslog string) []string {
-	c, _ := strconv.Atoi(count)
+	c, err := strconv.Atoi(count)
+	if err != nil || c < 1 || c > 10000 {
+		return []string{"Invalid count specified! Must be between 1 and 10000."}
+	}
 	var lines []string
 
 	if syslog == "true" {
+		// Validate level parameter to prevent command injection
+		validLevels := map[string]bool{
+			"emerg": true, "alert": true, "crit": true, "err": true,
+			"warning": true, "notice": true, "info": true, "debug": true,
+			"0": true, "1": true, "2": true, "3": true, "4": true, "5": true, "6": true, "7": true,
+		}
+		if !validLevels[level] {
+			return []string{"Invalid log level specified!"}
+		}
+
 		cmdArgs := []string{"journalctl", "-u", "x-ui", "--no-pager", "-n", count, "-p", level}
 		// Run the command
 		cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
@@ -611,6 +624,21 @@ func (s *ServerService) UpdateGeofile(fileName string) error {
 		{"https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat", "geosite_RU.dat"},
 	}
 
+	// Validate fileName to prevent path traversal - must be exactly one of the allowed files
+	var fileURL string
+	fileNameValid := false
+	for _, file := range files {
+		if file.FileName == fileName {
+			fileURL = file.URL
+			fileNameValid = true
+			break
+		}
+	}
+
+	if !fileNameValid {
+		return common.NewErrorf("File '%s' not found in the list of Geofiles", fileName)
+	}
+
 	downloadFile := func(url, destPath string) error {
 		resp, err := http.Get(url)
 		if err != nil {
@@ -630,18 +658,6 @@ func (s *ServerService) UpdateGeofile(fileName string) error {
 		}
 
 		return nil
-	}
-
-	var fileURL string
-	for _, file := range files {
-		if file.FileName == fileName {
-			fileURL = file.URL
-			break
-		}
-	}
-
-	if fileURL == "" {
-		return common.NewErrorf("File '%s' not found in the list of Geofiles", fileName)
 	}
 
 	destPath := fmt.Sprintf("%s/%s", config.GetBinFolderPath(), fileName)
