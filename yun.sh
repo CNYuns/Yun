@@ -85,7 +85,7 @@ before_show_menu() {
 
 # 安装面板
 install() {
-    bash <(curl -Ls https://gitee.com/YX-love/3x-ui/raw/master/install.sh)
+    bash <(curl -Ls https://gitee.com/quanx/yun/raw/master/install.sh)
     if [[ $? == 0 ]]; then
         if [[ $# == 0 ]]; then
             start
@@ -105,7 +105,7 @@ update() {
         fi
         return 0
     fi
-    bash <(curl -Ls https://gitee.com/YX-love/3x-ui/raw/master/install.sh)
+    bash <(curl -Ls https://gitee.com/quanx/yun/raw/master/install.sh)
     if [[ $? == 0 ]]; then
         echo -e "${green}更新完成，已自动重启面板${plain}"
         exit 0
@@ -121,14 +121,14 @@ uninstall() {
         fi
         return 0
     fi
-    systemctl stop x-ui
-    systemctl disable x-ui
-    rm /etc/systemd/system/x-ui.service -f
+    systemctl stop yun
+    systemctl disable yun
+    rm /etc/systemd/system/yun.service -f
     systemctl daemon-reload
     systemctl reset-failed
-    rm /etc/x-ui/ -rf
-    rm /usr/local/x-ui/ -rf
-    rm /usr/bin/x-ui -f
+    rm /etc/yun/ -rf
+    rm /usr/local/yun/ -rf
+    rm /usr/bin/yun -f
     echo -e "${green}卸载成功${plain}"
 }
 
@@ -141,7 +141,7 @@ reset_user() {
         fi
         return 0
     fi
-    /usr/local/x-ui/x-ui setting -username admin -password admin
+    /usr/local/yun/yun setting -username admin -password admin
     echo -e "${green}用户名和密码已重置为 ${yellow}admin${green}，现在请重启面板${plain}"
     confirm_restart
 }
@@ -155,16 +155,16 @@ reset_config() {
         fi
         return 0
     fi
-    /usr/local/x-ui/x-ui setting -reset
+    /usr/local/yun/yun setting -reset
     echo -e "${green}所有面板设置已重置为默认值，现在请重启面板，并使用默认的 ${yellow}54321${green} 端口访问面板${plain}"
     confirm_restart
 }
 
 # 显示当前设置
 check_config() {
-    info=$(/usr/local/x-ui/x-ui setting -show)
+    info=$(/usr/local/yun/yun setting -show)
     if [[ $? != 0 ]]; then
-        echo -e "${red}获取当前设置失败，可能是因为存在错误，请备份 /etc/x-ui/x-ui.db 文件后卸载并重新安装面板${plain}"
+        echo -e "${red}获取当前设置失败，可能是因为存在错误，请备份 /etc/yun/yun.db 文件后卸载并重新安装面板${plain}"
         exit 1
     fi
     echo -e "${info}"
@@ -177,7 +177,7 @@ set_port() {
         echo -e "${yellow}已取消${plain}"
         before_show_menu
     else
-        /usr/local/x-ui/x-ui setting -port ${port}
+        /usr/local/yun/yun setting -port ${port}
         echo -e "${green}设置端口完毕，现在请重启面板${plain}"
         confirm_restart
     fi
@@ -190,11 +190,11 @@ start() {
         echo ""
         echo -e "${green}面板已运行，无需再次启动，如需重启请选择重启${plain}"
     else
-        systemctl start x-ui
+        systemctl start yun
         sleep 2
         check_status
         if [[ $? == 0 ]]; then
-            echo -e "${green}x-ui 启动成功${plain}"
+            echo -e "${green}yun 启动成功${plain}"
         else
             echo -e "${red}面板启动失败，可能是因为启动时间超过了两秒，请稍后查看日志信息${plain}"
         fi
@@ -212,11 +212,11 @@ stop() {
         echo ""
         echo -e "${green}面板已停止，无需再次停止${plain}"
     else
-        systemctl stop x-ui
+        systemctl stop yun
         sleep 2
         check_status
         if [[ $? == 1 ]]; then
-            echo -e "${green}x-ui 与 xray 停止成功${plain}"
+            echo -e "${green}yun 与 xray 停止成功${plain}"
         else
             echo -e "${red}面板停止失败，可能是因为停止时间超过了两秒，请稍后查看日志信息${plain}"
         fi
@@ -229,11 +229,11 @@ stop() {
 
 # 重启面板
 restart() {
-    systemctl restart x-ui
+    systemctl restart yun
     sleep 2
     check_status
     if [[ $? == 0 ]]; then
-        echo -e "${green}x-ui 与 xray 重启成功${plain}"
+        echo -e "${green}yun 与 xray 重启成功${plain}"
     else
         echo -e "${red}面板重启失败，可能是因为启动时间超过了两秒，请稍后查看日志信息${plain}"
     fi
@@ -244,7 +244,7 @@ restart() {
 
 # 查看面板状态
 status() {
-    systemctl status x-ui -l
+    systemctl status yun -l
     if [[ $# == 0 ]]; then
         before_show_menu
     fi
@@ -252,11 +252,11 @@ status() {
 
 # 设置开机自启
 enable() {
-    systemctl enable x-ui
+    systemctl enable yun
     if [[ $? == 0 ]]; then
-        echo -e "${green}x-ui 设置开机自启成功${plain}"
+        echo -e "${green}yun 设置开机自启成功${plain}"
     else
-        echo -e "${red}x-ui 设置开机自启失败${plain}"
+        echo -e "${red}yun 设置开机自启失败${plain}"
     fi
 
     if [[ $# == 0 ]]; then
@@ -266,11 +266,11 @@ enable() {
 
 # 取消开机自启
 disable() {
-    systemctl disable x-ui
+    systemctl disable yun
     if [[ $? == 0 ]]; then
-        echo -e "${green}x-ui 取消开机自启成功${plain}"
+        echo -e "${green}yun 取消开机自启成功${plain}"
     else
-        echo -e "${red}x-ui 取消开机自启失败${plain}"
+        echo -e "${red}yun 取消开机自启失败${plain}"
     fi
 
     if [[ $# == 0 ]]; then
@@ -280,7 +280,7 @@ disable() {
 
 # 查看面板日志
 show_log() {
-    journalctl -u x-ui.service -e --no-pager -f
+    journalctl -u yun.service -e --no-pager -f
     if [[ $# == 0 ]]; then
         before_show_menu
     fi
@@ -288,7 +288,7 @@ show_log() {
 
 # 迁移v2-ui数据
 migrate_v2_ui() {
-    /usr/local/x-ui/x-ui v2-ui
+    /usr/local/yun/yun v2-ui
 
     before_show_menu
 }
@@ -303,13 +303,13 @@ install_bbr() {
 
 # 更新管理脚本
 update_shell() {
-    wget -O /usr/bin/x-ui -N --no-check-certificate https://gitee.com/YX-love/3x-ui/raw/master/x-ui.sh
+    wget -O /usr/bin/yun -N --no-check-certificate https://gitee.com/quanx/yun/raw/master/yun.sh
     if [[ $? != 0 ]]; then
         echo ""
         echo -e "${red}下载脚本失败，请检查本机能否连接 Gitee${plain}"
         before_show_menu
     else
-        chmod +x /usr/bin/x-ui
+        chmod +x /usr/bin/yun
         echo -e "${green}升级脚本成功，请重新运行脚本${plain}" && exit 0
     fi
 }
@@ -317,10 +317,10 @@ update_shell() {
 # 检查面板状态
 # 返回值: 0-运行中, 1-未运行, 2-未安装
 check_status() {
-    if [[ ! -f /etc/systemd/system/x-ui.service ]]; then
+    if [[ ! -f /etc/systemd/system/yun.service ]]; then
         return 2
     fi
-    temp=$(systemctl status x-ui | grep Active | awk '{print $3}' | cut -d "(" -f2 | cut -d ")" -f1)
+    temp=$(systemctl status yun | grep Active | awk '{print $3}' | cut -d "(" -f2 | cut -d ")" -f1)
     if [[ x"${temp}" == x"running" ]]; then
         return 0
     else
@@ -330,7 +330,7 @@ check_status() {
 
 # 检查是否开机自启
 check_enabled() {
-    temp=$(systemctl is-enabled x-ui)
+    temp=$(systemctl is-enabled yun)
     if [[ x"${temp}" == x"enabled" ]]; then
         return 0
     else
@@ -418,46 +418,46 @@ show_xray_status() {
 
 # 显示使用帮助
 show_usage() {
-    echo "x-ui 管理脚本使用方法: "
+    echo "yun 管理脚本使用方法: "
     echo "------------------------------------------"
-    echo "x-ui              - 显示管理菜单 (功能更多)"
-    echo "x-ui start        - 启动 x-ui 面板"
-    echo "x-ui stop         - 停止 x-ui 面板"
-    echo "x-ui restart      - 重启 x-ui 面板"
-    echo "x-ui status       - 查看 x-ui 状态"
-    echo "x-ui enable       - 设置 x-ui 开机自启"
-    echo "x-ui disable      - 取消 x-ui 开机自启"
-    echo "x-ui log          - 查看 x-ui 日志"
-    echo "x-ui v2-ui        - 迁移本机器的 v2-ui 账号数据至 x-ui"
-    echo "x-ui update       - 更新 x-ui 面板"
-    echo "x-ui install      - 安装 x-ui 面板"
-    echo "x-ui uninstall    - 卸载 x-ui 面板"
+    echo "yun              - 显示管理菜单 (功能更多)"
+    echo "yun start        - 启动 yun 面板"
+    echo "yun stop         - 停止 yun 面板"
+    echo "yun restart      - 重启 yun 面板"
+    echo "yun status       - 查看 yun 状态"
+    echo "yun enable       - 设置 yun 开机自启"
+    echo "yun disable      - 取消 yun 开机自启"
+    echo "yun log          - 查看 yun 日志"
+    echo "yun v2-ui        - 迁移本机器的 v2-ui 账号数据至 yun"
+    echo "yun update       - 更新 yun 面板"
+    echo "yun install      - 安装 yun 面板"
+    echo "yun uninstall    - 卸载 yun 面板"
     echo "------------------------------------------"
 }
 
 # 显示菜单
 show_menu() {
     echo -e "
-  ${green}x-ui 面板管理脚本${plain}
+  ${green}yun 面板管理脚本${plain}
   ${green}0.${plain} 退出脚本
 ————————————————
-  ${green}1.${plain} 安装 x-ui
-  ${green}2.${plain} 更新 x-ui
-  ${green}3.${plain} 卸载 x-ui
+  ${green}1.${plain} 安装 yun
+  ${green}2.${plain} 更新 yun
+  ${green}3.${plain} 卸载 yun
 ————————————————
   ${green}4.${plain} 重置用户名密码
   ${green}5.${plain} 重置面板设置
   ${green}6.${plain} 设置面板端口
   ${green}7.${plain} 查看当前面板设置
 ————————————————
-  ${green}8.${plain} 启动 x-ui
-  ${green}9.${plain} 停止 x-ui
-  ${green}10.${plain} 重启 x-ui
-  ${green}11.${plain} 查看 x-ui 状态
-  ${green}12.${plain} 查看 x-ui 日志
+  ${green}8.${plain} 启动 yun
+  ${green}9.${plain} 停止 yun
+  ${green}10.${plain} 重启 yun
+  ${green}11.${plain} 查看 yun 状态
+  ${green}12.${plain} 查看 yun 日志
 ————————————————
-  ${green}13.${plain} 设置 x-ui 开机自启
-  ${green}14.${plain} 取消 x-ui 开机自启
+  ${green}13.${plain} 设置 yun 开机自启
+  ${green}14.${plain} 取消 yun 开机自启
 ————————————————
   ${green}15.${plain} 一键安装 bbr (最新内核)
   ${green}16.${plain} 迁移 v2-ui 账号数据

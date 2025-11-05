@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"x-ui/logger"
-	"x-ui/xray"
+	"yun/logger"
+	"yun/xray"
 )
 
 type ClearLogsJob struct{}

@@ -10,14 +10,14 @@ import (
 	"strings"
 	"time"
 
-	"x-ui/database"
-	"x-ui/database/model"
-	"x-ui/logger"
-	"x-ui/util/common"
-	"x-ui/util/random"
-	"x-ui/util/reflect_util"
-	"x-ui/web/entity"
-	"x-ui/xray"
+	"yun/database"
+	"yun/database/model"
+	"yun/logger"
+	"yun/util/common"
+	"yun/util/random"
+	"yun/util/reflect_util"
+	"yun/web/entity"
+	"yun/xray"
 )
 
 //go:embed config.json
@@ -32,7 +32,7 @@ var defaultValueMap = map[string]string{
 	"webKeyFile":                  "",
 	"secret":                      random.Seq(32),
 	"webBasePath":                 "/",
-	"sessionMaxAge":               "60",
+	"sessionMaxAge":               "360",
 	"pageSize":                    "50",
 	"expireDiff":                  "0",
 	"trafficDiff":                 "0",

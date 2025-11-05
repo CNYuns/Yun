@@ -12,9 +12,9 @@ import (
 	"syscall"
 	"time"
 
-	"x-ui/config"
-	"x-ui/logger"
-	"x-ui/util/common"
+	"yun/config"
+	"yun/logger"
+	"yun/util/common"
 )
 
 func GetBinaryName() string {

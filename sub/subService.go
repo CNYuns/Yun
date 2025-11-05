@@ -7,13 +7,13 @@ import (
 	"strings"
 	"time"
 
-	"x-ui/database"
-	"x-ui/database/model"
-	"x-ui/logger"
-	"x-ui/util/common"
-	"x-ui/util/random"
-	"x-ui/web/service"
-	"x-ui/xray"
+	"yun/database"
+	"yun/database/model"
+	"yun/logger"
+	"yun/util/common"
+	"yun/util/random"
+	"yun/web/service"
+	"yun/xray"
 
 	"github.com/goccy/go-json"
 )

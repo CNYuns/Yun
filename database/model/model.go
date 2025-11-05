@@ -3,8 +3,8 @@ package model
 import (
 	"fmt"
 
-	"x-ui/util/json_util"
-	"x-ui/xray"
+	"yun/util/json_util"
+	"yun/xray"
 )
 
 type Protocol string
@@ -104,4 +104,15 @@ type Client struct {
 	SubID      string `json:"subId" form:"subId"`
 	Comment    string `json:"comment" form:"comment"`
 	Reset      int    `json:"reset" form:"reset"`
+}
+
+// InboundLog 入站日志模型
+type InboundLog struct {
+	Id         int    `json:"id" gorm:"primaryKey;autoIncrement"`
+	InboundId  int    `json:"inboundId" form:"inboundId" gorm:"index"`
+	InboundTag string `json:"inboundTag" form:"inboundTag" gorm:"index"`
+	LogType    string `json:"logType" form:"logType"` // connection, error, warning
+	RemoteAddr string `json:"remoteAddr" form:"remoteAddr"`
+	Message    string `json:"message" form:"message" gorm:"type:text"`
+	CreatedAt  int64  `json:"createdAt" form:"createdAt" gorm:"index"`
 }

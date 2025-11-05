@@ -1,10 +1,10 @@
 package service
 
 import (
-	"x-ui/database"
-	"x-ui/database/model"
-	"x-ui/logger"
-	"x-ui/xray"
+	"yun/database"
+	"yun/database/model"
+	"yun/logger"
+	"yun/xray"
 
 	"gorm.io/gorm"
 )

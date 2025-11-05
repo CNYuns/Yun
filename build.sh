@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 3x-ui 多架构构建脚本
+# yun 多架构构建脚本
 # 用于构建所有平台的发行版
 
 set -e
@@ -15,14 +15,14 @@ XRAY_VERSION="v25.6.8"
 XRAY_URL="https://github.com/XTLS/Xray-core/releases/download/${XRAY_VERSION}/"
 
 echo -e "${GREEN}=========================================${NC}"
-echo -e "${GREEN}3x-ui 安全增强版 - 多架构构建脚本${NC}"
+echo -e "${GREEN}yun - 多架构构建脚本${NC}"
 echo -e "${GREEN}=========================================${NC}"
 echo ""
 
 # 清理旧文件
 clean_old_files() {
     echo -e "${YELLOW}清理旧构建文件...${NC}"
-    rm -rf x-ui x-ui-linux-*.tar.gz x-ui-windows-*.zip xui-release 2>/dev/null || true
+    rm -rf yun yun-linux-*.tar.gz yun-windows-*.zip yun-release 2>/dev/null || true
     echo -e "${GREEN}✓ 清理完成${NC}"
     echo ""
 }
@@ -145,7 +145,7 @@ build_linux() {
     esac
 
     # 编译
-    echo -e "${YELLOW}编译 x-ui...${NC}"
+    echo -e "${YELLOW}编译 yun...${NC}"
     export CGO_ENABLED=1
     export GOOS=linux
     export GOARCH=$goarch
@@ -154,7 +154,7 @@ build_linux() {
         export GOARM=$goarm
     fi
 
-    go build -ldflags "-w -s" -o xui-release -v main.go || {
+    go build -ldflags "-w -s" -o yun-release -v main.go || {
         echo -e "${RED}✗ 编译失败${NC}"
         return 1
     }
@@ -163,25 +163,25 @@ build_linux() {
 
     # 创建发布目录
     echo -e "${YELLOW}准备发布文件...${NC}"
-    mkdir -p x-ui/bin
+    mkdir -p yun/bin
 
-    cp xui-release x-ui/x-ui
-    cp x-ui.service x-ui/
-    cp x-ui.sh x-ui/
+    cp yun-release yun/yun
+    cp yun.service yun/
+    cp yun.sh yun/
 
     # 进入 bin 目录下载依赖
-    cd x-ui/bin
+    cd yun/bin
     download_xray_and_geo $platform
     cd ../..
 
     # 打包
     echo -e "${YELLOW}打包...${NC}"
-    tar -zcf x-ui-linux-${platform}.tar.gz x-ui
+    tar -zcf yun-linux-${platform}.tar.gz yun
 
     # 清理
-    rm -rf x-ui xui-release
+    rm -rf yun yun-release
 
-    echo -e "${GREEN}✓ x-ui-linux-${platform}.tar.gz 构建完成！${NC}"
+    echo -e "${GREEN}✓ yun-linux-${platform}.tar.gz 构建完成！${NC}"
     echo ""
 }
 
@@ -192,13 +192,13 @@ build_windows() {
     echo -e "${GREEN}=========================================${NC}"
 
     # 编译
-    echo -e "${YELLOW}编译 x-ui.exe...${NC}"
+    echo -e "${YELLOW}编译 yun.exe...${NC}"
     export CGO_ENABLED=1
     export GOOS=windows
     export GOARCH=amd64
     export CC=x86_64-w64-mingw32-gcc
 
-    go build -ldflags "-w -s" -o xui-release.exe -v main.go || {
+    go build -ldflags "-w -s" -o yun-release.exe -v main.go || {
         echo -e "${RED}✗ 编译失败${NC}"
         return 1
     }
@@ -207,23 +207,23 @@ build_windows() {
 
     # 创建发布目录
     echo -e "${YELLOW}准备发布文件...${NC}"
-    mkdir -p x-ui/bin
+    mkdir -p yun/bin
 
-    cp xui-release.exe x-ui/x-ui.exe
+    cp yun-release.exe yun/yun.exe
 
     # 进入 bin 目录下载依赖
-    cd x-ui/bin
+    cd yun/bin
     download_xray_and_geo windows-amd64
     cd ../..
 
     # 打包为 zip
     echo -e "${YELLOW}打包...${NC}"
-    zip -q -r x-ui-windows-amd64.zip x-ui
+    zip -q -r yun-windows-amd64.zip yun
 
     # 清理
-    rm -rf x-ui xui-release.exe
+    rm -rf yun yun-release.exe
 
-    echo -e "${GREEN}✓ x-ui-windows-amd64.zip 构建完成！${NC}"
+    echo -e "${GREEN}✓ yun-windows-amd64.zip 构建完成！${NC}"
     echo ""
 }
 
@@ -259,7 +259,7 @@ main() {
     echo -e "${GREEN}=========================================${NC}"
     echo ""
     echo -e "${YELLOW}生成的文件：${NC}"
-    ls -lh x-ui-*.tar.gz x-ui-*.zip 2>/dev/null || true
+    ls -lh yun-*.tar.gz yun-*.zip 2>/dev/null || true
     echo ""
     echo -e "${GREEN}✓ 所有发行版已准备就绪！${NC}"
 }

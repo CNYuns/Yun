@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"x-ui/database/model"
-	"x-ui/web/service"
-	"x-ui/web/session"
+	"yun/database/model"
+	"yun/web/service"
+	"yun/web/session"
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,6 +41,8 @@ func (a *InboundController) initRouter(g *gin.RouterGroup) {
 	g.POST("/delDepletedClients/:id", a.delDepletedClients)
 	g.POST("/import", a.importInbound)
 	g.POST("/onlines", a.onlines)
+	g.GET("/logs/:id", a.getInboundLogs)
+	g.GET("/clientConfig/:id/:type", a.getClientConfig)
 }
 
 func (a *InboundController) getInbounds(c *gin.Context) {
@@ -338,4 +340,72 @@ func (a *InboundController) delDepletedClients(c *gin.Context) {
 
 func (a *InboundController) onlines(c *gin.Context) {
 	jsonObj(c, a.inboundService.GetOnlineClients(), nil)
+}
+
+func (a *InboundController) getInboundLogs(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		jsonMsg(c, I18nWeb(c, "get"), err)
+		return
+	}
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "50"))
+	logType := c.DefaultQuery("logType", "")
+
+	logService := &service.InboundLogService{}
+	logs, total, err := logService.GetLogsByInboundId(id, page, pageSize, logType)
+	if err != nil {
+		jsonMsg(c, "获取日志失败", err)
+		return
+	}
+	jsonObj(c, map[string]interface{}{
+		"logs":     logs,
+		"total":    total,
+		"page":     page,
+		"pageSize": pageSize,
+	}, nil)
+}
+
+func (a *InboundController) getClientConfig(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		jsonMsg(c, I18nWeb(c, "get"), err)
+		return
+	}
+
+	configType := c.Param("type") // v2ray, clash, ssh, guide
+
+	inbound, err := a.inboundService.GetInbound(id)
+	if err != nil {
+		jsonMsg(c, I18nWeb(c, "pages.inbounds.toasts.obtain"), err)
+		return
+	}
+
+	clientConfigService := &service.ClientConfigService{}
+	var result string
+
+	switch configType {
+	case "v2ray":
+		result, err = clientConfigService.GenerateV2rayConfig(inbound)
+	case "clash":
+		result, err = clientConfigService.GenerateClashConfig(inbound)
+	case "ssh":
+		serverIP := clientConfigService.GetServerIP()
+		result = clientConfigService.GenerateSSHTunnelScript(serverIP, "22", "root")
+	case "guide":
+		result = clientConfigService.GenerateQuickSetupGuide(inbound)
+	default:
+		jsonMsg(c, "不支持的配置类型", nil)
+		return
+	}
+
+	if err != nil {
+		jsonMsg(c, "生成配置失败", err)
+		return
+	}
+
+	jsonObj(c, map[string]interface{}{
+		"config": result,
+		"type":   configType,
+	}, nil)
 }

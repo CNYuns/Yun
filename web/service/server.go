@@ -16,12 +16,12 @@ import (
 	"strings"
 	"time"
 
-	"x-ui/config"
-	"x-ui/database"
-	"x-ui/logger"
-	"x-ui/util/common"
-	"x-ui/util/sys"
-	"x-ui/xray"
+	"yun/config"
+	"yun/database"
+	"yun/logger"
+	"yun/util/common"
+	"yun/util/sys"
+	"yun/xray"
 
 	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/disk"
@@ -443,7 +443,7 @@ func (s *ServerService) GetLogs(count string, level string, syslog string) []str
 			return []string{"Invalid log level specified!"}
 		}
 
-		cmdArgs := []string{"journalctl", "-u", "x-ui", "--no-pager", "-n", count, "-p", level}
+		cmdArgs := []string{"journalctl", "-u", "yun", "--no-pager", "-n", count, "-p", level}
 		// Run the command
 		cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
 		var out bytes.Buffer
@@ -553,7 +553,7 @@ func (s *ServerService) ImportDB(file multipart.File) error {
 	}
 
 	// Check if we can init the db or not
-	if err = database.InitDB(tempPath); err != nil {
+	if _, err = database.InitDB(tempPath); err != nil {
 		return common.NewErrorf("Error checking db: %v", err)
 	}
 
@@ -594,7 +594,7 @@ func (s *ServerService) ImportDB(file multipart.File) error {
 	}
 
 	// Migrate DB
-	if err = database.InitDB(config.GetDBPath()); err != nil {
+	if _, err = database.InitDB(config.GetDBPath()); err != nil {
 		if errRename := os.Rename(fallbackPath, config.GetDBPath()); errRename != nil {
 			return common.NewErrorf("Error migrating db and restoring fallback: %v", errRename)
 		}

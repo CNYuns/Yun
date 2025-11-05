@@ -14,15 +14,15 @@ import (
 	"strings"
 	"time"
 
-	"x-ui/config"
-	"x-ui/logger"
-	"x-ui/util/common"
-	"x-ui/web/controller"
-	"x-ui/web/job"
-	"x-ui/web/locale"
-	"x-ui/web/middleware"
-	"x-ui/web/network"
-	"x-ui/web/service"
+	"yun/config"
+	"yun/logger"
+	"yun/util/common"
+	"yun/web/controller"
+	"yun/web/job"
+	"yun/web/locale"
+	"yun/web/middleware"
+	"yun/web/network"
+	"yun/web/service"
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/sessions"
@@ -183,7 +183,7 @@ func (s *Server) initRouter() (*gin.Engine, error) {
 	assetsBasePath := basePath + "assets/"
 
 	store := cookie.NewStore(secret)
-	engine.Use(sessions.Sessions("3x-ui", store))
+	engine.Use(sessions.Sessions("yun", store))
 	engine.Use(func(c *gin.Context) {
 		c.Set("base_path", basePath)
 	})
@@ -268,6 +268,9 @@ func (s *Server) startTask() {
 
 	// check client ips from log file every day
 	s.cron.AddJob("@daily", job.NewClearLogsJob())
+
+	// clean old inbound logs every day at 3:00 AM
+	s.cron.AddJob("0 3 * * *", job.NewCleanInboundLogsJob())
 
 	// Make a traffic condition every day, 8:30
 	var entry cron.EntryID

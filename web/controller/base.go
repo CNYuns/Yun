@@ -3,9 +3,9 @@ package controller
 import (
 	"net/http"
 
-	"x-ui/logger"
-	"x-ui/web/locale"
-	"x-ui/web/session"
+	"yun/logger"
+	"yun/web/locale"
+	"yun/web/session"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,7 +15,9 @@ type BaseController struct{}
 func (a *BaseController) checkLogin(c *gin.Context) {
 	if !session.IsLogin(c) {
 		if isAjax(c) {
-			pureJsonMsg(c, http.StatusUnauthorized, false, I18nWeb(c, "pages.login.loginAgain"))
+			// Return 404 instead of 401 for unauthenticated API requests
+			// to prevent attackers from discovering API endpoints (v2.8.4 security fix)
+			pureJsonMsg(c, http.StatusNotFound, false, I18nWeb(c, "pages.login.loginAgain"))
 		} else {
 			c.Redirect(http.StatusTemporaryRedirect, c.GetString("base_path"))
 		}

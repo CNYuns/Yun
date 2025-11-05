@@ -1,17 +1,21 @@
 {{ define "page/head_start" }}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="renderer" content="webkit">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex,nofollow">
-  <link rel="stylesheet" href="{{ .base_path }}assets/ant-design-vue/antd.min.css">
-  <link rel="stylesheet" href="{{ .base_path }}assets/css/custom.min.css?{{ .cur_ver }}">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Custom Fonts -->
   <style>
-    [v-cloak] {
-      display: none;
-    }
     /* vazirmatn-regular - arabic_latin_latin-ext */
     @font-face {
       font-display: swap;
@@ -21,10 +25,33 @@
       src: url('{{ .base_path }}assets/Vazirmatn-UI-NL-Regular.woff2') format('woff2');
       unicode-range: U+0600-06FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE80-FEFC, U+0030-0039;
     }
+
+    :root {
+      --primary-color: #0d6efd;
+      --secondary-color: #6c757d;
+      --success-color: #198754;
+      --danger-color: #dc3545;
+      --warning-color: #ffc107;
+      --info-color: #0dcaf0;
+      --dark-color: #212529;
+      --light-color: #f8f9fa;
+    }
+
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Vazirmatn', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background-color: #f5f7fa;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
+
   <title>{{ .host }} – {{ i18n .title}}</title>
 {{ end }}
 
@@ -38,17 +65,81 @@
 {{ end }}
 
 {{ define "page/body_scripts" }}
-<script src="{{ .base_path }}assets/vue/vue.min.js?{{ .cur_ver }}"></script>
-<script src="{{ .base_path }}assets/moment/moment.min.js"></script>
-<script src="{{ .base_path }}assets/ant-design-vue/antd.min.js"></script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
+
+<!-- Bootstrap 5 JS Bundle (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+<!-- Axios for HTTP requests -->
 <script src="{{ .base_path }}assets/axios/axios.min.js?{{ .cur_ver }}"></script>
-<script src="{{ .base_path }}assets/qs/qs.min.js"></script>
-<script src="{{ .base_path }}assets/js/axios-init.js?{{ .cur_ver }}"></script>
-<script src="{{ .base_path }}assets/js/util/date-util.js?{{ .cur_ver }}"></script>
-<script src="{{ .base_path }}assets/js/util/index.js?{{ .cur_ver }}"></script>
+
+<!-- Moment.js for date handling -->
+<script src="{{ .base_path }}assets/moment/moment.min.js"></script>
+
+<!-- Custom utilities -->
 <script>
   const basePath = '{{ .base_path }}';
   axios.defaults.baseURL = basePath;
+
+  // Global notification function
+  window.showNotification = function(message, type = 'info') {
+    const alertDiv = $('<div>')
+      .addClass(`alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`)
+      .css('z-index', 9999)
+      .html(`
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `);
+
+    $('body').append(alertDiv);
+
+    setTimeout(() => {
+      alertDiv.alert('close');
+    }, 5000);
+  };
+
+  // Global loading overlay
+  window.showLoading = function() {
+    const loader = $('<div>')
+      .attr('id', 'global-loader')
+      .addClass('position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center')
+      .css({
+        'background': 'rgba(0,0,0,0.5)',
+        'z-index': 9998
+      })
+      .html('<div class="spinner-border text-light" style="width: 3rem; height: 3rem;"></div>');
+
+    $('body').append(loader);
+  };
+
+  window.hideLoading = function() {
+    $('#global-loader').remove();
+  };
+
+  // Axios interceptors for loading and errors
+  axios.interceptors.request.use(config => {
+    if (!config.hideLoader) {
+      showLoading();
+    }
+    return config;
+  });
+
+  axios.interceptors.response.use(
+    response => {
+      hideLoading();
+      if (response.data && !response.data.success && response.data.msg) {
+        showNotification(response.data.msg, 'warning');
+      }
+      return response;
+    },
+    error => {
+      hideLoading();
+      const message = error.response?.data?.msg || error.message || 'An error occurred';
+      showNotification(message, 'danger');
+      return Promise.reject(error);
+    }
+  );
 </script>
 {{ end }}
   

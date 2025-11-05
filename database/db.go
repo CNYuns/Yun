@@ -9,10 +9,11 @@ import (
 	"path"
 	"slices"
 
-	"x-ui/config"
-	"x-ui/database/model"
-	"x-ui/util/crypto"
-	"x-ui/xray"
+	"yun/config"
+	"yun/database/model"
+	"yun/util/crypto"
+	"yun/util/random"
+	"yun/xray"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -23,7 +24,6 @@ var db *gorm.DB
 
 const (
 	defaultUsername = "admin"
-	defaultPassword = "admin"
 )
 
 func initModels() error {
@@ -35,6 +35,7 @@ func initModels() error {
 		&model.InboundClientIps{},
 		&xray.ClientTraffic{},
 		&model.HistoryOfSeeders{},
+		&model.InboundLog{},
 	}
 	for _, model := range models {
 		if err := db.AutoMigrate(model); err != nil {
@@ -45,27 +46,34 @@ func initModels() error {
 	return nil
 }
 
-func initUser() error {
+func initUser() (string, error) {
 	empty, err := isTableEmpty("users")
 	if err != nil {
 		log.Printf("Error checking if users table is empty: %v", err)
-		return err
+		return "", err
 	}
 	if empty {
-		hashedPassword, err := crypto.HashPasswordAsBcrypt(defaultPassword)
+		// Generate a strong random password (16 characters)
+		randomPassword := random.StrongPassword(16)
+		hashedPassword, err := crypto.HashPasswordAsBcrypt(randomPassword)
 
 		if err != nil {
-			log.Printf("Error hashing default password: %v", err)
-			return err
+			log.Printf("Error hashing password: %v", err)
+			return "", err
 		}
 
 		user := &model.User{
 			Username: defaultUsername,
 			Password: hashedPassword,
 		}
-		return db.Create(user).Error
+		err = db.Create(user).Error
+		if err != nil {
+			return "", err
+		}
+		// Return the plain text password for display (only once)
+		return randomPassword, nil
 	}
-	return nil
+	return "", nil
 }
 
 func runSeeders(isUsersEmpty bool) error {
@@ -113,11 +121,11 @@ func isTableEmpty(tableName string) (bool, error) {
 	return count == 0, err
 }
 
-func InitDB(dbPath string) error {
+func InitDB(dbPath string) (string, error) {
 	dir := path.Dir(dbPath)
 	err := os.MkdirAll(dir, fs.ModePerm)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	var gormLogger logger.Interface
@@ -133,19 +141,26 @@ func InitDB(dbPath string) error {
 	}
 	db, err = gorm.Open(sqlite.Open(dbPath), c)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if err := initModels(); err != nil {
-		return err
+		return "", err
 	}
 
 	isUsersEmpty, err := isTableEmpty("users")
 
-	if err := initUser(); err != nil {
-		return err
+	generatedPassword, err := initUser()
+	if err != nil {
+		return "", err
 	}
-	return runSeeders(isUsersEmpty)
+
+	err = runSeeders(isUsersEmpty)
+	if err != nil {
+		return "", err
+	}
+
+	return generatedPassword, nil
 }
 
 func CloseDB() error {

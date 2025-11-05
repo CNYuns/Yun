@@ -2,9 +2,9 @@ package job
 
 import (
 	"encoding/json"
-	"x-ui/logger"
-	"x-ui/web/service"
-	"x-ui/xray"
+	"yun/logger"
+	"yun/web/service"
+	"yun/xray"
 
 	"github.com/valyala/fasthttp"
 )

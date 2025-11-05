@@ -2,7 +2,7 @@
     "panel": {
         "listen": ":54321",
         "baseUrl": "",
-        "sessionMaxAge": 43200,
+        "sessionMaxAge": 21600,
         "pageSize": 20,
         "session_timeout": 720,
         "tcpport": 0,

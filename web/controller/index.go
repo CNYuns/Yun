@@ -6,10 +6,10 @@ import (
 	"text/template"
 	"time"
 
-	"x-ui/logger"
-	"x-ui/web/middleware"
-	"x-ui/web/service"
-	"x-ui/web/session"
+	"yun/logger"
+	"yun/web/middleware"
+	"yun/web/service"
+	"yun/web/session"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"

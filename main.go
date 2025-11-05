@@ -9,14 +9,15 @@ import (
 	"syscall"
 	_ "unsafe"
 
-	"x-ui/config"
-	"x-ui/database"
-	"x-ui/logger"
-	"x-ui/sub"
-	"x-ui/util/crypto"
-	"x-ui/web"
-	"x-ui/web/global"
-	"x-ui/web/service"
+	"yun/config"
+	"yun/database"
+	"yun/logger"
+	"yun/sub"
+	"yun/util/crypto"
+	"yun/util/random"
+	"yun/web"
+	"yun/web/global"
+	"yun/web/service"
 
 	"github.com/joho/godotenv"
 	"github.com/op/go-logging"
@@ -42,9 +43,25 @@ func runWebServer() {
 
 	godotenv.Load()
 
-	err := database.InitDB(config.GetDBPath())
+	generatedPassword, err := database.InitDB(config.GetDBPath())
 	if err != nil {
 		log.Fatalf("Error initializing database: %v", err)
+	}
+
+	// Display generated password if this is a new installation
+	if generatedPassword != "" {
+		log.Println("╔════════════════════════════════════════════════════════════════╗")
+		log.Println("║                   FIRST TIME INSTALLATION                      ║")
+		log.Println("╠════════════════════════════════════════════════════════════════╣")
+		log.Println("║  A random password has been generated for your admin account   ║")
+		log.Println("║  PLEASE COPY THIS PASSWORD NOW - IT WILL NOT BE SHOWN AGAIN!   ║")
+		log.Println("╠════════════════════════════════════════════════════════════════╣")
+		log.Printf("║  Username: %-51s ║\n", "admin")
+		log.Printf("║  Password: %-51s ║\n", generatedPassword)
+		log.Println("╠════════════════════════════════════════════════════════════════╣")
+		log.Println("║  Please change your password after first login!                ║")
+		log.Println("╚════════════════════════════════════════════════════════════════╝")
+		log.Println()
 	}
 
 	var server *web.Server
@@ -112,7 +129,7 @@ func runWebServer() {
 }
 
 func resetSetting() {
-	err := database.InitDB(config.GetDBPath())
+	_, err := database.InitDB(config.GetDBPath())
 	if err != nil {
 		fmt.Println("Failed to initialize database:", err)
 		return
@@ -122,9 +139,29 @@ func resetSetting() {
 	err = settingService.ResetSettings()
 	if err != nil {
 		fmt.Println("Failed to reset settings:", err)
-	} else {
-		fmt.Println("Settings successfully reset.")
+		return
 	}
+
+	// Also reset user password
+	userService := service.UserService{}
+	newPassword := random.StrongPassword(16)
+	err = userService.UpdateFirstUser("", newPassword)
+	if err != nil {
+		fmt.Println("Failed to reset user password:", err)
+		return
+	}
+
+	fmt.Println("╔════════════════════════════════════════════════════════════════╗")
+	fmt.Println("║                    SETTINGS RESET SUCCESSFUL                   ║")
+	fmt.Println("╠════════════════════════════════════════════════════════════════╣")
+	fmt.Println("║  A new random password has been generated for your account     ║")
+	fmt.Println("║  PLEASE COPY THIS PASSWORD NOW - IT WILL NOT BE SHOWN AGAIN!   ║")
+	fmt.Println("╠════════════════════════════════════════════════════════════════╣")
+	fmt.Printf("║  Username: %-51s ║\n", "admin")
+	fmt.Printf("║  Password: %-51s ║\n", newPassword)
+	fmt.Println("╠════════════════════════════════════════════════════════════════╣")
+	fmt.Println("║  All settings have been reset to default values                ║")
+	fmt.Println("╚════════════════════════════════════════════════════════════════╝")
 }
 
 func showSetting(show bool) {
@@ -196,7 +233,7 @@ func updateTgbotEnableSts(status bool) {
 }
 
 func updateTgbotSetting(tgBotToken string, tgBotChatid string, tgBotRuntime string) {
-	err := database.InitDB(config.GetDBPath())
+	_, err := database.InitDB(config.GetDBPath())
 	if err != nil {
 		fmt.Println("Error initializing database:", err)
 		return
@@ -233,7 +270,7 @@ func updateTgbotSetting(tgBotToken string, tgBotChatid string, tgBotRuntime stri
 }
 
 func updateSetting(port int, username string, password string, webBasePath string, listenIP string) {
-	err := database.InitDB(config.GetDBPath())
+	_, err := database.InitDB(config.GetDBPath())
 	if err != nil {
 		fmt.Println("Database initialization failed:", err)
 		return
@@ -280,7 +317,7 @@ func updateSetting(port int, username string, password string, webBasePath strin
 }
 
 func updateCert(publicKey string, privateKey string) {
-	err := database.InitDB(config.GetDBPath())
+	_, err := database.InitDB(config.GetDBPath())
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -340,7 +377,7 @@ func GetListenIP(getListen bool) {
 func migrateDb() {
 	inboundService := service.InboundService{}
 
-	err := database.InitDB(config.GetDBPath())
+	_, err := database.InitDB(config.GetDBPath())
 	if err != nil {
 		log.Fatal(err)
 	}

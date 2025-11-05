@@ -8,8 +8,8 @@ import (
 	"time"
 	"math"
 
-	"x-ui/logger"
-	"x-ui/util/common"
+	"yun/logger"
+	"yun/util/common"
 
 	"github.com/xtls/xray-core/app/proxyman/command"
 	statsService "github.com/xtls/xray-core/app/stats/command"

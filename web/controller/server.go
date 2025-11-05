@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"time"
 
-	"x-ui/web/global"
-	"x-ui/web/service"
+	"yun/web/global"
+	"yun/web/service"
 
 	"github.com/gin-gonic/gin"
 )

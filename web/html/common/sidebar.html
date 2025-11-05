@@ -1,0 +1,227 @@
+{{ define "component/sidebar" }}
+<style>
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding: 0;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+    background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+    transition: all 0.3s ease;
+    width: 260px;
+  }
+
+  .sidebar-sticky {
+    position: sticky;
+    top: 0;
+    height: calc(100vh - 48px);
+    padding-top: 0.5rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .sidebar-header {
+    padding: 1.5rem 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .sidebar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sidebar-brand:hover {
+    color: #fff;
+    opacity: 0.9;
+  }
+
+  .sidebar .nav {
+    flex-direction: column;
+  }
+
+  .sidebar .nav-link {
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.75rem 1rem;
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sidebar .nav-link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    border-left-color: #0d6efd;
+  }
+
+  .sidebar .nav-link.active {
+    color: #fff;
+    background: rgba(13, 110, 253, 0.2);
+    border-left-color: #0d6efd;
+  }
+
+  .sidebar .nav-link i {
+    font-size: 1.2rem;
+    width: 24px;
+  }
+
+  .sidebar-toggler {
+    display: none;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1050;
+    background: #2c3e50;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .main-content {
+    margin-left: 260px;
+    transition: margin-left 0.3s ease;
+  }
+
+  .navbar-top {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,.08);
+    padding: 0.75rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .sidebar {
+      margin-left: -260px;
+    }
+
+    .sidebar.show {
+      margin-left: 0;
+    }
+
+    .main-content {
+      margin-left: 0;
+    }
+
+    .sidebar-toggler {
+      display: block;
+    }
+  }
+
+  .user-info {
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    color: white;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .sidebar-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+  }
+</style>
+
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="{{ .base_path }}panel/" class="sidebar-brand">
+      <i class="bi bi-shield-lock-fill"></i>
+      <span>Yun Panel</span>
+    </a>
+  </div>
+
+  <div class="sidebar-sticky">
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="{{ .base_path }}panel/" data-page="index">
+          <i class="bi bi-speedometer2"></i>
+          <span>{{ i18n "menu.dashboard" }}</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ .base_path }}panel/inbounds" data-page="inbounds">
+          <i class="bi bi-arrow-down-circle"></i>
+          <span>{{ i18n "menu.inbounds" }}</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ .base_path }}panel/xray" data-page="xray">
+          <i class="bi bi-gear-wide-connected"></i>
+          <span>{{ i18n "menu.xray" }}</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ .base_path }}panel/settings" data-page="settings">
+          <i class="bi bi-gear-fill"></i>
+          <span>{{ i18n "menu.settings" }}</span>
+        </a>
+      </li>
+    </ul>
+
+    <hr style="border-color: rgba(255,255,255,0.2); margin: 1rem;">
+
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="{{ .base_path }}logout">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>{{ i18n "logout" }}</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-person-circle" style="font-size: 2rem; margin-right: 10px;"></i>
+        <div>
+          <div style="font-weight: 600;" id="username-display">Admin</div>
+          <small style="opacity: 0.8;">Administrator</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button class="sidebar-toggler" id="sidebarToggle">
+  <i class="bi bi-list" style="font-size: 1.5rem;"></i>
+</button>
+
+<script>
+$(document).ready(function() {
+  // Sidebar toggle for mobile
+  $('#sidebarToggle').on('click', function() {
+    $('#sidebar').toggleClass('show');
+  });
+
+  // Close sidebar when clicking outside on mobile
+  $(document).on('click', function(e) {
+    if ($(window).width() <= 768) {
+      if (!$(e.target).closest('#sidebar, #sidebarToggle').length) {
+        $('#sidebar').removeClass('show');
+      }
+    }
+  });
+
+  // Highlight active nav item based on current page
+  const currentPath = window.location.pathname;
+  $('.sidebar .nav-link').each(function() {
+    const href = $(this).attr('href');
+    if (currentPath.includes($(this).data('page'))) {
+      $(this).addClass('active');
+    }
+  });
+});
+</script>
+{{ end }}

@@ -7,7 +7,7 @@ import (
 	"time"
 	"math"
 
-	"x-ui/util/common"
+	"yun/util/common"
 )
 
 type Msg struct {

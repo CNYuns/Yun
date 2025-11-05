@@ -12,7 +12,7 @@ import (
 var sqlInjectionPatterns = []*regexp.Regexp{
 	regexp.MustCompile(`(?i)(union\s+select|select\s+.*\s+from|insert\s+into|delete\s+from|drop\s+table|update\s+.*\s+set|exec\s*\(|execute\s*\()`),
 	regexp.MustCompile(`(?i)(--|;|\/\*|\*\/|xp_|sp_|0x[0-9a-f]+)`),
-	regexp.MustCompile(`(?i)('|\"|`)\s*(or|and)\s*('|\"|`)\s*('|\"|`)?\s*=\s*('|\"|`)?`),
+	regexp.MustCompile("(?i)('|\"|`)" + `\s*(or|and)\s*` + "('|\"|`)" + `\s*` + "('|\"|`)?" + `\s*=\s*` + "('|\"|`)?"),
 }
 
 // XSS patterns

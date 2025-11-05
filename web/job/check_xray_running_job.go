@@ -1,8 +1,8 @@
 package job
 
 import (
-	"x-ui/logger"
-	"x-ui/web/service"
+	"yun/logger"
+	"yun/web/service"
 )
 
 type CheckXrayRunningJob struct {

@@ -178,10 +178,10 @@ install_base() {
 # 检查面板状态
 # 返回值: 0-运行中, 1-未运行, 2-未安装
 check_status() {
-    if [[ ! -f /etc/systemd/system/x-ui.service ]]; then
+    if [[ ! -f /etc/systemd/system/yun.service ]]; then
         return 2
     fi
-    temp=$(systemctl status x-ui | grep Active | awk '{print $3}' | cut -d "(" -f2 | cut -d ")" -f1)
+    temp=$(systemctl status yun | grep Active | awk '{print $3}' | cut -d "(" -f2 | cut -d ")" -f1)
     if [[ x"${temp}" == x"running" ]]; then
         return 0
     else
@@ -189,29 +189,29 @@ check_status() {
     fi
 }
 
-# 安装x-ui面板
-install_x_ui() {
+# 安装yun面板
+install_yun() {
     # 检查服务是否存在，存在则停止
-    if [ -f /etc/systemd/system/x-ui.service ]; then
-        systemctl stop x-ui
+    if [ -f /etc/systemd/system/yun.service ]; then
+        systemctl stop yun
     fi
     cd /usr/local/
 
     if [ $# == 0 ]; then
-        # 获取最新版本号（使用可靠的方式）
-        last_version="v2.6.1"
-        echo -e "开始安装 x-ui ${last_version}"
-        
+        # 获取最新版本号
+        last_version="v3.0.0"
+        echo -e "开始安装 yun ${last_version}"
+
         # 下载最新版本
-        wget -N --no-check-certificate -O /usr/local/x-ui-linux-${arch}.tar.gz https://gitee.com/YX-love/3x-ui/releases/download/${last_version}/x-ui-linux-${arch}.tar.gz
-        
+        wget -N --no-check-certificate -O /usr/local/yun-linux-${arch}.tar.gz https://gitee.com/quanx/yun/releases/download/${last_version}/yun-linux-${arch}.tar.gz
+
         if [[ $? -ne 0 ]]; then
-            echo -e "${red}下载 x-ui 失败，请确保你的服务器能够下载 Gitee 的文件${plain}"
+            echo -e "${red}下载 yun 失败，请确保你的服务器能够下载 Gitee 的文件${plain}"
             echo -e "${yellow}正在尝试备用下载链接...${plain}"
-            
+
             # 备用下载链接
-            wget -N --no-check-certificate -O /usr/local/x-ui-linux-${arch}.tar.gz https://ghproxy.com/https://github.com/MHSanaei/3x-ui/releases/download/${last_version}/x-ui-linux-${arch}.tar.gz
-            
+            wget -N --no-check-certificate -O /usr/local/yun-linux-${arch}.tar.gz https://gitee.com/quanx/yun/releases/download/${last_version}/yun-linux-${arch}.tar.gz
+
             if [[ $? -ne 0 ]]; then
                 echo -e "${red}备用下载也失败，请手动下载并上传到服务器${plain}"
                 exit 1
@@ -220,55 +220,55 @@ install_x_ui() {
     else
         # 安装指定版本
         last_version=$1
-        url="https://gitee.com/YX-love/3x-ui/releases/download/${last_version}/x-ui-linux-${arch}.tar.gz"
-        echo -e "开始安装 x-ui v$1"
-        wget -N --no-check-certificate -O /usr/local/x-ui-linux-${arch}.tar.gz ${url}
+        url="https://gitee.com/quanx/yun/releases/download/${last_version}/yun-linux-${arch}.tar.gz"
+        echo -e "开始安装 yun v$1"
+        wget -N --no-check-certificate -O /usr/local/yun-linux-${arch}.tar.gz ${url}
         if [[ $? -ne 0 ]]; then
-            echo -e "${red}下载 x-ui v$1 失败，请确保此版本存在${plain}"
+            echo -e "${red}下载 yun v$1 失败，请确保此版本存在${plain}"
             exit 1
         fi
     fi
 
     # 删除旧目录并解压
-    if [[ -e /usr/local/x-ui/ ]]; then
-        rm /usr/local/x-ui/ -rf
+    if [[ -e /usr/local/yun/ ]]; then
+        rm /usr/local/yun/ -rf
     fi
 
-    tar zxvf x-ui-linux-${arch}.tar.gz
-    rm x-ui-linux-${arch}.tar.gz -f
-    cd x-ui
-    chmod +x x-ui bin/xray-linux-${arch}
-    cp -f x-ui.service /etc/systemd/system/
-    
+    tar zxvf yun-linux-${arch}.tar.gz
+    rm yun-linux-${arch}.tar.gz -f
+    cd yun
+    chmod +x yun bin/xray-linux-${arch}
+    cp -f yun.service /etc/systemd/system/
+
     # 创建必要的目录
-    mkdir -p /etc/x-ui
-    mkdir -p /var/log/x-ui
-    
+    mkdir -p /etc/yun
+    mkdir -p /var/log/yun
+
     # 下载管理脚本
-    wget --no-check-certificate -O /usr/bin/x-ui https://gitee.com/YX-love/3x-ui/raw/master/x-ui.sh
-    chmod +x /usr/local/x-ui/x-ui.sh
-    chmod +x /usr/bin/x-ui
-    
+    wget --no-check-certificate -O /usr/bin/yun https://gitee.com/quanx/yun/raw/master/yun.sh
+    chmod +x /usr/local/yun/yun.sh
+    chmod +x /usr/bin/yun
+
     # 安装后配置 - 设置随机用户名和密码
     config_after_install
-    
+
     # 启动服务
     systemctl daemon-reload
-    systemctl enable x-ui
-    systemctl start x-ui
-    
+    systemctl enable yun
+    systemctl start yun
+
     # 等待服务启动
     sleep 3
-    
+
     # 验证配置是否正确设置
     echo -e "${yellow}正在验证配置...${plain}"
-    ACTUAL_CONFIG=$(/usr/local/x-ui/x-ui setting -show 2>/dev/null)
-    
+    ACTUAL_CONFIG=$(/usr/local/yun/yun setting -show 2>/dev/null)
+
     # 从配置输出中提取实际的端口和路径
     if [[ -n "$ACTUAL_CONFIG" ]]; then
         ACTUAL_PORT=$(echo "$ACTUAL_CONFIG" | grep "port:" | awk '{print $2}')
         ACTUAL_PATH=$(echo "$ACTUAL_CONFIG" | grep "webBasePath:" | awk '{print $2}')
-        
+
         # 如果提取成功，使用实际值；否则使用预设值
         if [[ -n "$ACTUAL_PORT" ]]; then
             PANEL_PORT="$ACTUAL_PORT"
@@ -277,14 +277,14 @@ install_x_ui() {
             PANEL_PATH="$ACTUAL_PATH"
         fi
     fi
-    
+
     # 显示安装信息
-    echo -e "${green}x-ui ${last_version}${plain} 安装完成，面板已启动"
+    echo -e "${green}yun ${last_version}${plain} 安装完成，面板已启动"
     echo -e ""
-    
+
     # 获取服务器IP地址
     SERVER_IP=$(get_server_ip)
-    
+
     echo -e "面板访问信息如下(请妥善保存):"
     echo -e "------------------------"
     echo -e "面板地址: ${green}http://${SERVER_IP}:${PANEL_PORT}${PANEL_PATH}${plain}"
@@ -293,33 +293,32 @@ install_x_ui() {
     echo -e "------------------------"
     echo -e "${red}注意: 以上访问信息是随机生成的，请务必记录保存，丢失将无法找回！${plain}"
     echo -e ""
-    echo -e "x-ui 管理脚本使用方法: "
+    echo -e "yun 管理脚本使用方法: "
     echo -e "----------------------------------------------"
-    echo -e "x-ui              - 显示管理菜单 (功能更多)"
-    echo -e "x-ui start        - 启动 x-ui 面板"
-    echo -e "x-ui stop         - 停止 x-ui 面板"
-    echo -e "x-ui restart      - 重启 x-ui 面板"
-    echo -e "x-ui status       - 查看 x-ui 状态"
-    echo -e "x-ui enable       - 设置 x-ui 开机自启"
-    echo -e "x-ui disable      - 取消 x-ui 开机自启"
-    echo -e "x-ui log          - 查看 x-ui 日志"
-    echo -e "x-ui v2-ui        - 迁移本机器的 v2-ui 账号数据至 x-ui"
-    echo -e "x-ui update       - 更新 x-ui 面板"
-    echo -e "x-ui install      - 安装 x-ui 面板"
-    echo -e "x-ui uninstall    - 卸载 x-ui 面板"
+    echo -e "yun              - 显示管理菜单 (功能更多)"
+    echo -e "yun start        - 启动 yun 面板"
+    echo -e "yun stop         - 停止 yun 面板"
+    echo -e "yun restart      - 重启 yun 面板"
+    echo -e "yun status       - 查看 yun 状态"
+    echo -e "yun enable       - 设置 yun 开机自启"
+    echo -e "yun disable      - 取消 yun 开机自启"
+    echo -e "yun log          - 查看 yun 日志"
+    echo -e "yun update       - 更新 yun 面板"
+    echo -e "yun install      - 安装 yun 面板"
+    echo -e "yun uninstall    - 卸载 yun 面板"
     echo -e "----------------------------------------------"
 }
 
 # 安装后配置 - 设置随机用户名和密码
 config_after_install() {
     echo -e "${yellow}正在进行安装后配置...${plain}"
-    
-    # 运行x-ui命令设置随机用户名、密码、端口和路径
-    /usr/local/x-ui/x-ui setting -username ${PANEL_USER} -password ${PANEL_PASS} -port ${PANEL_PORT} -webBasePath ${PANEL_PATH}
-    
+
+    # 运行yun命令设置随机用户名、密码、端口和路径
+    /usr/local/yun/yun setting -username ${PANEL_USER} -password ${PANEL_PASS} -port ${PANEL_PORT} -webBasePath ${PANEL_PATH}
+
     echo -e "${green}面板配置设置成功！${plain}"
 }
 
 # 执行安装
 install_base
-install_x_ui $1
+install_yun $1

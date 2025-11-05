@@ -1,4 +1,4 @@
-name: Release 3X-UI
+name: Release Yun Panel
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
     types: [published]
   push:
     branches:
-      - main
+      - master
     paths:
       - '**.js'
       - '**.css'
@@ -15,7 +15,7 @@ on:
       - '**.go'
       - 'go.mod'
       - 'go.sum'
-      - 'x-ui.service'
+      - 'yun.service'
 
 jobs:
   build:
@@ -59,7 +59,7 @@ jobs:
             sudo apt install gcc-s390x-linux-gnu
           fi
 
-      - name: Build 3x-ui
+      - name: Build yun
         run: |
           export CGO_ENABLED=1
           export GOOS=linux
@@ -86,15 +86,15 @@ jobs:
             export GOARCH=s390x
             export CC=s390x-linux-gnu-gcc
           fi
-          go build -ldflags "-w -s" -o xui-release -v main.go
-          
-          mkdir x-ui
-          cp xui-release x-ui/
-          cp x-ui.service x-ui/
-          cp x-ui.sh x-ui/
-          mv x-ui/xui-release x-ui/x-ui
-          mkdir x-ui/bin
-          cd x-ui/bin
+          go build -ldflags "-w -s" -o yun-release -v main.go
+
+          mkdir yun
+          cp yun-release yun/
+          cp yun.service yun/
+          cp yun.sh yun/
+          mv yun/yun-release yun/yun
+          mkdir yun/bin
+          cd yun/bin
           
           # Download dependencies
           Xray_URL="https://github.com/XTLS/Xray-core/releases/download/v25.6.8/"
@@ -138,13 +138,13 @@ jobs:
           cd ../..
           
       - name: Package
-        run: tar -zcvf x-ui-linux-${{ matrix.platform }}.tar.gz x-ui
+        run: tar -zcvf yun-linux-${{ matrix.platform }}.tar.gz yun
 
       - name: Upload files to Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: x-ui-linux-${{ matrix.platform }}
-          path: ./x-ui-linux-${{ matrix.platform }}.tar.gz
+          name: yun-linux-${{ matrix.platform }}
+          path: ./yun-linux-${{ matrix.platform }}.tar.gz
 
       - name: Upload files to GH release
         uses: svenstaro/upload-release-action@v2
@@ -152,6 +152,6 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref }}
-          file: x-ui-linux-${{ matrix.platform }}.tar.gz
-          asset_name: x-ui-linux-${{ matrix.platform }}.tar.gz
+          file: yun-linux-${{ matrix.platform }}.tar.gz
+          asset_name: yun-linux-${{ matrix.platform }}.tar.gz
           prerelease: true

@@ -1,624 +1,409 @@
 {{ template "page/head_start" .}}
 <style>
-  html * {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
   }
 
-  h1 {
+  .login-container {
+    max-width: 450px;
+    width: 100%;
+  }
+
+  .login-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    animation: slideUp 0.5s ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .login-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px 30px;
     text-align: center;
-    /*margin: 20px 0 50px 0;*/
-    height: 110px;
   }
 
-  .ant-form-item-children .ant-btn,
-  .ant-input {
-    height: 50px;
-    border-radius: 30px;
+  .login-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
   }
 
-  .ant-input-group-addon {
-    border-radius: 0 30px 30px 0;
-    width: 50px;
-    font-size: 18px;
+  .login-header p {
+    margin: 10px 0 0 0;
+    opacity: 0.9;
+    font-size: 0.95rem;
   }
 
-  .ant-input-affix-wrapper .ant-input-prefix {
-    left: 23px;
+  .login-body {
+    padding: 40px 30px;
   }
 
-  .ant-input-affix-wrapper .ant-input:not(:first-child) {
+  .form-floating {
+    margin-bottom: 20px;
+  }
+
+  .form-floating > .form-control {
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    height: 60px;
+    padding-left: 50px;
+    transition: all 0.3s ease;
+  }
+
+  .form-floating > .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.15);
+  }
+
+  .form-floating > label {
     padding-left: 50px;
   }
 
-  .centered {
-    display: flex;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
+  .input-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #667eea;
+    font-size: 1.2rem;
+    z-index: 4;
+  }
+
+  .btn-login {
     width: 100%;
-  }
-
-  .title {
-    font-size: 2rem;
-    margin-block-end: 2rem;
-  }
-
-  .title b {
-    font-weight: bold !important;
-  }
-
-  #app {
+    height: 55px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+    position: relative;
     overflow: hidden;
   }
 
-  #login {
-    animation: charge 0.5s both;
-    background-color: #fff;
-    border-radius: 2rem;
-    padding: 4rem 3rem;
-    transition: all 0.3s;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
+  .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
   }
 
-  #login:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  .btn-login:active {
+    transform: translateY(0);
   }
 
-  @keyframes charge {
-    from {
-      transform: translateY(5rem);
-      opacity: 0;
-    }
-
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-
-  .under {
-    background-color: #c7ebe2;
-    z-index: 0;
-  }
-
-  .dark .under {
-    background-color: var(--dark-color-login-wave);
-  }
-
-  .dark #login {
-    background-color: var(--dark-color-surface-100);
-  }
-
-  .dark h1 {
-    color: rgba(255, 255, 255);
-  }
-
-  .ant-btn-primary-login {
-    width: 100%;
-  }
-
-  .ant-btn-primary-login:focus,
-  .ant-btn-primary-login:hover {
-    color: #fff;
-    background-color: #006655;
-    border-color: #006655;
-    background-image: linear-gradient(270deg,
-        rgba(123, 199, 77, 0) 30%,
-        #009980,
-        rgba(123, 199, 77, 0) 100%);
-    background-repeat: no-repeat;
-    animation: ma-bg-move ease-in-out 5s infinite;
-    background-position-x: -500px;
-    width: 95%;
-    animation-delay: -0.5s;
-    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
-  }
-
-  .ant-btn-primary-login.active,
-  .ant-btn-primary-login:active {
-    color: #fff;
-    background-color: #006655;
-    border-color: #006655;
-  }
-
-  @keyframes ma-bg-move {
-    0% {
-      background-position: -500px 0;
-    }
-
-    50% {
-      background-position: 1000px 0;
-    }
-
-    100% {
-      background-position: 1000px 0;
-    }
-  }
-
-  .wave-btn-bg {
-    position: relative;
-    border-radius: 25px;
-    width: 100%;
-    transition: all 0.3s cubic-bezier(.645, .045, .355, 1);
-  }
-
-  .dark .wave-btn-bg {
-    color: #fff;
-    position: relative;
-    background-color: #0a7557;
-    border: 2px double transparent;
-    background-origin: border-box;
-    background-clip: padding-box, border-box;
-    background-size: 300%;
-    width: 100%;
-    z-index: 1;
-  }
-
-  .dark .wave-btn-bg:hover {
-    animation: wave-btn-tara 4s ease infinite;
-  }
-
-  .dark .wave-btn-bg-cl {
-    background-image: linear-gradient(rgba(13, 14, 33, 0), rgba(13, 14, 33, 0)),
-      radial-gradient(circle at left top, #006655, #009980, #006655) !important;
-    border-radius: 3em;
-  }
-
-  .dark .wave-btn-bg-cl:hover {
-    width: 95%;
-  }
-
-  .dark .wave-btn-bg-cl:before {
+  .btn-login::before {
+    content: '';
     position: absolute;
-    content: "";
-    top: -5px;
-    left: -5px;
-    bottom: -5px;
-    right: -5px;
-    z-index: -1;
-    background: inherit;
-    background-size: inherit;
-    border-radius: 4em;
-    opacity: 0;
-    transition: 0.5s;
-  }
-
-  .dark .wave-btn-bg-cl:hover::before {
-    opacity: 1;
-    filter: blur(20px);
-    animation: wave-btn-tara 8s linear infinite;
-  }
-
-  @keyframes wave-btn-tara {
-    to {
-      background-position: 300%;
-    }
-  }
-
-  .dark .ant-btn-primary-login {
-    font-size: 14px;
-    color: #fff;
-    text-align: center;
-    background-image: linear-gradient(rgba(13, 14, 33, 0.45),
-        rgba(13, 14, 33, 0.35));
-    border-radius: 2rem;
-    border: none;
-    outline: none;
-    background-color: transparent;
-    height: 46px;
-    position: relative;
-    white-space: nowrap;
-    cursor: pointer;
-    touch-action: manipulation;
-    padding: 0 15px;
+    top: 0;
+    left: -100%;
     width: 100%;
-    animation: none;
-    background-position-x: 0;
-    box-shadow: none;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: left 0.5s ease;
   }
 
-  .waves-header {
-    position: fixed;
-    width: 100%;
-    text-align: center;
-    background-color: #dbf5ed;
+  .btn-login:hover::before {
+    left: 100%;
+  }
+
+  .settings-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     color: white;
-    z-index: -1;
-  }
-
-  .dark .waves-header {
-    background-color: var(--dark-color-login-background);
-  }
-
-  .waves-inner-header {
-    height: 50vh;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-  }
-
-  .waves {
-    position: relative;
-    width: 100%;
-    height: 15vh;
-    margin-bottom: -8px;
-    /*Fix for safari gap*/
-    min-height: 100px;
-    max-height: 150px;
-  }
-
-  .parallax>use {
-    animation: move-forever 25s cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;
-  }
-
-  .dark .parallax>use {
-    fill: var(--dark-color-login-wave);
-  }
-
-  .parallax>use:nth-child(1) {
-    animation-delay: -2s;
-    animation-duration: 4s;
-    opacity: 0.2;
-  }
-
-  .parallax>use:nth-child(2) {
-    animation-delay: -3s;
-    animation-duration: 7s;
-    opacity: 0.4;
-  }
-
-  .parallax>use:nth-child(3) {
-    animation-delay: -4s;
-    animation-duration: 10s;
-    opacity: 0.6;
-  }
-
-  .parallax>use:nth-child(4) {
-    animation-delay: -5s;
-    animation-duration: 13s;
-  }
-
-  @keyframes move-forever {
-    0% {
-      transform: translate3d(-90px, 0, 0);
-    }
-
-    100% {
-      transform: translate3d(85px, 0, 0);
-    }
-  }
-
-  @media (max-width: 768px) {
-    .waves {
-      height: 40px;
-      min-height: 40px;
-    }
-  }
-  
-    @media (max-width: 1024px) {
-    .title {
-      font-size: 1.4rem;
-    }
-  }
-
-  .words-wrapper {
-    width: 100%;
-    display: inline-block;
-    position: relative;
-    text-align: center;
-  }
-
-  .words-wrapper b {
-    width: 100%;
-    display: inline-block;
-    position: absolute;
-    left: 0;
-    top: 0;
-  }
-
-  .words-wrapper b.is-visible {
-    position: relative;
-  }
-
-  .headline.zoom .words-wrapper {
-    -webkit-perspective: 300px;
-    -moz-perspective: 300px;
-    perspective: 300px;
-  }
-
-  .headline {
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
   }
 
-  .headline.zoom b {
-    opacity: 0;
+  .settings-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
   }
 
-  .headline.zoom b.is-visible {
-    opacity: 1;
-    -webkit-animation: zoom-in 0.8s;
-    -moz-animation: zoom-in 0.8s;
-    animation: cubic-bezier(0.215, 0.610, 0.355, 1.000) zoom-in 0.8s;
-  }
-
-  .headline.zoom b.is-hidden {
-    -webkit-animation: zoom-out 0.8s;
-    -moz-animation: zoom-out 0.8s;
-    animation: cubic-bezier(0.215, 0.610, 0.355, 1.000) zoom-out 0.4s;
-  }
-
-  @-webkit-keyframes zoom-in {
-    0% {
-      opacity: 0;
-      -webkit-transform: translateZ(100px);
-    }
-
-    100% {
-      opacity: 1;
-      -webkit-transform: translateZ(0);
-    }
-  }
-
-  @-moz-keyframes zoom-in {
-    0% {
-      opacity: 0;
-      -moz-transform: translateZ(100px);
-    }
-
-    100% {
-      opacity: 1;
-      -moz-transform: translateZ(0);
-    }
-  }
-
-  @keyframes zoom-in {
-    0% {
-      opacity: 0;
-      -webkit-transform: translateZ(100px);
-      -moz-transform: translateZ(100px);
-      -ms-transform: translateZ(100px);
-      -o-transform: translateZ(100px);
-      transform: translateZ(100px);
-    }
-
-    100% {
-      opacity: 1;
-      -webkit-transform: translateZ(0);
-      -moz-transform: translateZ(0);
-      -ms-transform: translateZ(0);
-      -o-transform: translateZ(0);
-      transform: translateZ(0);
-    }
-  }
-
-  @-webkit-keyframes zoom-out {
-    0% {
-      opacity: 1;
-      -webkit-transform: translateZ(0);
-    }
-
-    100% {
-      opacity: 0;
-      -webkit-transform: translateZ(-100px);
-    }
-  }
-
-  @-moz-keyframes zoom-out {
-    0% {
-      opacity: 1;
-      -moz-transform: translateZ(0);
-    }
-
-    100% {
-      opacity: 0;
-      -moz-transform: translateZ(-100px);
-    }
-  }
-
-  @keyframes zoom-out {
-    0% {
-      opacity: 1;
-      -webkit-transform: translateZ(0);
-      -moz-transform: translateZ(0);
-      -ms-transform: translateZ(0);
-      -o-transform: translateZ(0);
-      transform: translateZ(0);
-    }
-
-    100% {
-      opacity: 0;
-      -webkit-transform: translateZ(-100px);
-      -moz-transform: translateZ(-100px);
-      -ms-transform: translateZ(-100px);
-      -o-transform: translateZ(-100px);
-      transform: translateZ(-100px);
-    }
-  }
-
-  .setting-section {
+  .password-toggle {
     position: absolute;
-    top: 0;
-    right: 0;
-    padding: 22px;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #667eea;
+    z-index: 4;
+    font-size: 1.2rem;
   }
 
-  .ant-space-item .ant-switch {
-    margin: 2px 0 4px;
+  .spinner-border-sm {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  @media (max-width: 576px) {
+    .login-header h1 {
+      font-size: 1.5rem;
+    }
+
+    .login-body {
+      padding: 30px 20px;
+    }
+
+    .form-floating > .form-control {
+      height: 55px;
+    }
+
+    .btn-login {
+      height: 50px;
+      font-size: 1rem;
+    }
+  }
+
+  .fade-in {
+    animation: fadeIn 0.5s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .login-card {
+      background: rgba(30, 30, 30, 0.95);
+      color: #e0e0e0;
+    }
+
+    .form-floating > .form-control {
+      background-color: #2a2a2a;
+      border-color: #444;
+      color: #e0e0e0;
+    }
+
+    .form-floating > label {
+      color: #999;
+    }
   }
 </style>
 {{ template "page/head_end" .}}
 
 {{ template "page/body_start" .}}
-<a-layout id="app" v-cloak :class="themeSwitcher.currentTheme">
-  <transition name="list" appear>
-    <a-layout-content class="under" :style="{ minHeight: '0' }">
-      <div class="waves-header">
-        <div class="waves-inner-header"></div>
-        <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-          viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
-          <defs>
-            <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
-          </defs>
-          <g class="parallax">
-            <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(0, 135, 113, 0.08)" />
-            <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(0, 135, 113, 0.08)" />
-            <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(0, 135, 113, 0.08)" />
-            <use xlink:href="#gentle-wave" x="48" y="7" fill="#c7ebe2" />
-          </g>
-        </svg>
+<div class="login-container">
+  <div class="login-card">
+    <!-- Settings Button -->
+    <div class="settings-btn" data-bs-toggle="modal" data-bs-target="#settingsModal">
+      <i class="bi bi-gear-fill"></i>
+    </div>
+
+    <!-- Header -->
+    <div class="login-header">
+      <h1><i class="bi bi-shield-lock-fill me-2"></i>{{ i18n "pages.login.title" }}</h1>
+      <p>{{ i18n "pages.login.hello" }}</p>
+    </div>
+
+    <!-- Body -->
+    <div class="login-body">
+      <form id="loginForm">
+        <!-- Username -->
+        <div class="form-floating position-relative">
+          <i class="bi bi-person-fill input-icon"></i>
+          <input type="text" class="form-control" id="username" name="username"
+                 placeholder='{{ i18n "username" }}' autocomplete="username" required autofocus>
+          <label for="username">{{ i18n "username" }}</label>
+        </div>
+
+        <!-- Password -->
+        <div class="form-floating position-relative">
+          <i class="bi bi-lock-fill input-icon"></i>
+          <input type="password" class="form-control" id="password" name="password"
+                 placeholder='{{ i18n "password" }}' autocomplete="current-password" required>
+          <label for="password">{{ i18n "password" }}</label>
+          <i class="bi bi-eye-fill password-toggle" id="passwordToggle"></i>
+        </div>
+
+        <!-- Two Factor Code (hidden by default) -->
+        <div class="form-floating position-relative" id="twoFactorGroup" style="display: none;">
+          <i class="bi bi-key-fill input-icon"></i>
+          <input type="text" class="form-control" id="twoFactorCode" name="twoFactorCode"
+                 placeholder='{{ i18n "twoFactorCode" }}' autocomplete="one-time-code">
+          <label for="twoFactorCode">{{ i18n "twoFactorCode" }}</label>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-login" id="loginBtn">
+          <span id="loginBtnText">{{ i18n "login" }}</span>
+          <div class="spinner-border spinner-border-sm text-light d-none" id="loginSpinner"></div>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="text-center mt-4 text-white">
+    <small>Powered by <strong>Yun Panel</strong> v{{ .cur_ver }}</small>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="settingsModalLabel"><i class="bi bi-gear-fill me-2"></i>{{ i18n "menu.settings" }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <a-row type="flex" justify="center" align="middle" :style="{ height: '100%', overflow: 'auto', overflowX: 'hidden' }">
-        <a-col :xs="22" :sm="12" :md="10" :lg="8" :xl="6" :xxl="5" id="login" :style="{ margin: '3rem 0' }">
-          <div class="setting-section">
-            <a-popover :overlay-class-name="themeSwitcher.currentTheme" title='{{ i18n "menu.settings" }}' placement="bottomRight" trigger="click">
-              <template slot="content">
-                <a-space direction="vertical" :size="10">
-                  <a-theme-switch-login></a-theme-switch-login>
-                  <span>{{ i18n "pages.settings.language" }}</span>
-                  <a-select ref="selectLang" :style="{ width: '100%' }" v-model="lang" @change="LanguageManager.setLanguage(lang)" :dropdown-class-name="themeSwitcher.currentTheme">
-                    <a-select-option :value="l.value" label="English" v-for="l in LanguageManager.supportedLanguages">
-                      <span role="img" aria-label="l.name" v-text="l.icon"></span>
-                      &nbsp;&nbsp;<span v-text="l.name"></span>
-                    </a-select-option>
-                  </a-select>
-                </a-space>
-              </template>
-              <a-button shape="circle" icon="setting"></a-button>
-            </a-popover>
-          </div>
-          <a-row type="flex" justify="center">
-            <a-col :style="{ width: '100%' }">
-              <h2 class="title headline zoom">
-                <span class="words-wrapper">
-                  <b class="is-visible">{{ i18n "pages.login.hello" }}</b>
-                  <b>{{ i18n "pages.login.title" }}</b>
-                </span>
-              </h2>
-            </a-col>
-          </a-row>
-          <a-row type="flex" justify="center">
-            <a-col span="24">
-              <a-form>
-                <a-space direction="vertical" size="middle">
-                  <a-form-item>
-                    <a-input autocomplete="username" name="username" v-model.trim="user.username"
-                      placeholder='{{ i18n "username" }}' @keydown.enter.native="login" autofocus>
-                      <a-icon slot="prefix" type="user" :style="{ fontSize: '1rem' }"></a-icon>
-                    </a-input>
-                  </a-form-item>
-                  <a-form-item>
-                    <a-input-password autocomplete="password" name="password" v-model.trim="user.password"
-                      placeholder='{{ i18n "password" }}' @keydown.enter.native="login">
-                      <a-icon slot="prefix" type="lock" :style="{ fontSize: '1rem' }"></a-icon>
-                    </a-input-password>
-                  </a-form-item>
-                  <a-form-item v-if="twoFactorEnable">
-                    <a-input autocomplete="totp" name="twoFactorCode" v-model.trim="user.twoFactorCode"
-                      placeholder='{{ i18n "twoFactorCode" }}' @keydown.enter.native="login">
-                      <a-icon slot="prefix" type="key" :style="{ fontSize: '1rem' }"></a-icon>
-                    </a-input>
-                  </a-form-item>
-                  <a-form-item>
-                    <a-row justify="center" class="centered">
-                      <div :style="{ height: '50px', marginTop: '1rem', ...loading ? { width: '52px' } : { display: 'inline-block' } }" class="wave-btn-bg wave-btn-bg-cl">
-                        <a-button class="ant-btn-primary-login" type="primary" :loading="loading" @click="login"
-                          :icon="loading ? 'poweroff' : undefined">
-                          [[ loading ? '' : '{{ i18n "login" }}' ]]
-                        </a-button>
-                      </div>
-                    </a-row>
-                  </a-form-item>
-                </a-space>
-              </a-form>
-            </a-col>
-          </a-row>
-        </a-col>
-      </a-row>
-    </a-layout-content>
-  </transition>
-</a-layout>
+      <div class="modal-body">
+        <!-- Language Selection -->
+        <div class="mb-3">
+          <label for="languageSelect" class="form-label">{{ i18n "pages.settings.language" }}</label>
+          <select class="form-select" id="languageSelect">
+            <option value="en-US">🇺🇸 English</option>
+            <option value="zh-CN">🇨🇳 简体中文</option>
+            <option value="fa-IR">🇮🇷 فارسی</option>
+            <option value="vi-VN">🇻🇳 Tiếng Việt</option>
+          </select>
+        </div>
+
+        <!-- Theme Toggle (Future feature) -->
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="darkModeSwitch">
+          <label class="form-check-label" for="darkModeSwitch">
+            <i class="bi bi-moon-stars-fill me-2"></i>Dark Mode (Coming Soon)
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 {{template "page/body_scripts" .}}
-{{template "component/aThemeSwitch" .}}
 <script>
-  const app = new Vue({
-    delimiters: ['[[', ']]'],
-    el: '#app',
-    data: {
-      themeSwitcher,
-      loading: false,
-      user: {
-        username: "",
-        password: "",
-        twoFactorCode: ""
-      },
-      twoFactorEnable: false,
-      lang: ""
-    },
-    async mounted() {
-      this.lang = LanguageManager.getLanguage();
-      this.twoFactorEnable = await this.getTwoFactorEnable();
-    },
-    methods: {
-      async login() {
-        this.loading = true;
-        const msg = await HttpUtil.post('/login', this.user);
-        this.loading = false;
-        if (msg.success) {
-          location.href = basePath + 'panel/';
+$(document).ready(function() {
+  let twoFactorEnabled = false;
+
+  // Check if two-factor is enabled
+  function checkTwoFactor() {
+    axios.post('/getTwoFactorEnable', {}, { hideLoader: true })
+      .then(response => {
+        if (response.data.success) {
+          twoFactorEnabled = response.data.obj;
+          if (twoFactorEnabled) {
+            $('#twoFactorGroup').show();
+          }
         }
-      },
-      async getTwoFactorEnable() {
-        this.loading = true;
-        const msg = await HttpUtil.post('/getTwoFactorEnable');
-        this.loading = false;
-        if (msg.success) {
-          this.twoFactorEnable = msg.obj;
-          return msg.obj;
-        }
-      },
-    },
-  });
-
-  document.addEventListener("DOMContentLoaded", function () {
-    var animationDelay = 2000;
-    initHeadline();
-
-    function initHeadline() {
-      animateHeadline(document.querySelectorAll('.headline'));
-    }
-
-    function animateHeadline(headlines) {
-      var duration = animationDelay;
-      headlines.forEach(function (headline) {
-        setTimeout(function () {
-          hideWord(headline.querySelector('.is-visible'));
-        }, duration);
+      })
+      .catch(error => {
+        console.error('Failed to check two-factor status:', error);
       });
-    }
+  }
 
-    function hideWord(word) {
-      var nextWord = takeNext(word);
-      switchWord(word, nextWord);
-      setTimeout(function () {
-        hideWord(nextWord);
-      }, animationDelay);
-    }
+  // Password toggle
+  $('#passwordToggle').on('click', function() {
+    const passwordInput = $('#password');
+    const icon = $(this);
 
-    function takeNext(word) {
-      return word.nextElementSibling ? word.nextElementSibling : word.parentElement.firstElementChild;
-    }
-
-    function switchWord(oldWord, newWord) {
-      oldWord.classList.remove('is-visible');
-      oldWord.classList.add('is-hidden');
-      newWord.classList.remove('is-hidden');
-      newWord.classList.add('is-visible');
+    if (passwordInput.attr('type') === 'password') {
+      passwordInput.attr('type', 'text');
+      icon.removeClass('bi-eye-fill').addClass('bi-eye-slash-fill');
+    } else {
+      passwordInput.attr('type', 'password');
+      icon.removeClass('bi-eye-slash-fill').addClass('bi-eye-fill');
     }
   });
+
+  // Login form submission
+  $('#loginForm').on('submit', function(e) {
+    e.preventDefault();
+
+    const username = $('#username').val().trim();
+    const password = $('#password').val().trim();
+    const twoFactorCode = $('#twoFactorCode').val().trim();
+
+    if (!username) {
+      showNotification('{{ i18n "pages.login.toasts.emptyUsername" }}', 'warning');
+      return;
+    }
+
+    if (!password) {
+      showNotification('{{ i18n "pages.login.toasts.emptyPassword" }}', 'warning');
+      return;
+    }
+
+    // Show loading state
+    $('#loginBtn').prop('disabled', true);
+    $('#loginBtnText').addClass('d-none');
+    $('#loginSpinner').removeClass('d-none');
+
+    // Submit login
+    axios.post('/login', {
+      username: username,
+      password: password,
+      twoFactorCode: twoFactorCode
+    })
+    .then(response => {
+      if (response.data.success) {
+        showNotification('{{ i18n "pages.login.toasts.successLogin" }}', 'success');
+        setTimeout(() => {
+          window.location.href = basePath + 'panel/';
+        }, 500);
+      } else {
+        // Reset button state
+        $('#loginBtn').prop('disabled', false);
+        $('#loginBtnText').removeClass('d-none');
+        $('#loginSpinner').addClass('d-none');
+      }
+    })
+    .catch(error => {
+      // Reset button state
+      $('#loginBtn').prop('disabled', false);
+      $('#loginBtnText').removeClass('d-none');
+      $('#loginSpinner').addClass('d-none');
+    });
+  });
+
+  // Language change handler (placeholder for now)
+  $('#languageSelect').on('change', function() {
+    const selectedLang = $(this).val();
+    // TODO: Implement language change functionality
+    console.log('Language changed to:', selectedLang);
+    showNotification('Language change will be available soon', 'info');
+  });
+
+  // Initialize
+  checkTwoFactor();
+
+  // Add enter key support for form fields
+  $('#username, #password, #twoFactorCode').on('keypress', function(e) {
+    if (e.which === 13) {
+      $('#loginForm').submit();
+    }
+  });
+});
 </script>
 {{ template "page/body_end" .}}

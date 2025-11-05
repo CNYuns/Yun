@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"x-ui/logger"
+	"yun/logger"
 )
 
 func NewLogWriter() *LogWriter {
@@ -34,6 +34,10 @@ func (lw *LogWriter) Write(m []byte) (n int, err error) {
 
 	regex := regexp.MustCompile(`^(\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}\.\d{6}) \[([^\]]+)\] (.+)$`)
 	messages := strings.SplitSeq(message, "\n")
+
+	// Note: Inbound log parsing has been removed to avoid circular dependencies
+	// The InboundLog feature needs to be implemented through a separate log monitoring mechanism
+	// TODO: Implement inbound log parsing using a file-based log monitor instead
 
 	for msg := range messages {
 		matches := regex.FindStringSubmatch(msg)

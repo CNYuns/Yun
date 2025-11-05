@@ -3,10 +3,10 @@ package service
 import (
 	"errors"
 
-	"x-ui/database"
-	"x-ui/database/model"
-	"x-ui/logger"
-	"x-ui/util/crypto"
+	"yun/database"
+	"yun/database/model"
+	"yun/logger"
+	"yun/util/crypto"
 
 	"github.com/xlzd/gotp"
 	"gorm.io/gorm"
