@@ -2,7 +2,7 @@
 
 > **Disclaimer**: This project is for learning and communication purposes only. It is prohibited for illegal use. Users are not related to the project developers.
 
-**Current Version**: v3.1.1
+**Current Version**: v3.1.2
 **Update Date**: 2025-11-08
 **Project**: [GitHub](https://github.com/CNYuns/yun) | [Gitee](https://gitee.com/cnyuns/yun)
 
@@ -235,4 +235,25 @@ If you like this project, please give it a Star ⭐!
 
 ---
 
-**Last Update**: 2025-11-07
+**Last Update**: 2025-11-08
+
+---
+
+## 📝 Changelog
+
+### v3.1.2 (2025-11-08)
+
+**Critical Fixes (Code Audit)**
+- 🐛 **Fixed Route Duplication** - InboundController nested routing groups caused duplicate registration
+- 🔧 **Fixed Wrong Error Messages** - 11 instances showing success messages on validation failures
+- 🛡️ **Fixed XSS Vulnerability** - Frontend directly inserted user data without escaping, added escapeHtml function
+
+**Technical Improvements**
+- ✅ InboundController.initRouter() no longer creates nested groups
+- ✅ All error handling unified to use "somethingWentWrong" message
+- ✅ All user input data HTML-escaped before display
+- ✅ Enhanced code security and robustness
+
+---
+
+### v3.1.1 (2025-11-08)

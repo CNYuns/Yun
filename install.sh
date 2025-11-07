@@ -199,7 +199,7 @@ install_yun() {
 
     if [ $# == 0 ]; then
         # 获取最新版本号
-        last_version="v3.1.1"
+        last_version="v3.1.2"
         echo -e "开始安装 yun ${last_version}"
 
         # 下载最新版本
