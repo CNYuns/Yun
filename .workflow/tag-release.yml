@@ -29,6 +29,7 @@ stages:
             export GOPROXY=https://goproxy.cn,https://goproxy.io,direct
             export GOSUMDB=sum.golang.google.cn
             export GO111MODULE=on
+            export GOTOOLCHAIN=local
 
             echo "Go version:"
             go version
