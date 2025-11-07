@@ -2,8 +2,8 @@
 
 > **Disclaimer**: This project is for learning and communication purposes only. It is prohibited for illegal use. Users are not related to the project developers.
 
-**Current Version**: v3.1.0
-**Update Date**: 2025-11-07
+**Current Version**: v3.1.1
+**Update Date**: 2025-11-08
 **Project**: [GitHub](https://github.com/CNYuns/yun) | [Gitee](https://gitee.com/cnyuns/yun)
 
 Yun Panel is a multi-protocol, multi-user Xray management panel that provides an easy-to-use Web interface and supports mainstream proxy protocols such as VMess, VLESS, Trojan, Shadowsocks, Socks5, etc.

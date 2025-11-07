@@ -2,8 +2,8 @@
 
 > **声明**: 该项目仅供学习交流使用，禁止用于非法用途，使用者与本项目开发者无关
 
-**当前版本**: v3.1.0
-**更新日期**: 2025-11-07
+**当前版本**: v3.1.1
+**更新日期**: 2025-11-08
 **项目地址**: [GitHub](https://github.com/CNYuns/yun) | [Gitee](https://gitee.com/cnyuns/yun)
 
 Yun Panel 是一个支持多协议多用户的 Xray 管理面板，提供简洁易用的 Web 界面，支持 VMess、VLESS、Trojan、Shadowsocks、Socks5 等主流代理协议。
@@ -299,6 +299,26 @@ go build -ldflags "-w -s" -o yun main.go
 ---
 
 ## 📝 版本更新
+
+### v3.1.1 (2025-11-08)
+
+**关键修复**
+- 🐛 **修复 jQuery 未加载错误** - "$ is not defined" 导致所有页面功能失效
+- 🔧 **修复 API 路径错误** - 前端API路径与后端路由不匹配，导致入站添加/编辑/删除全部失败
+- 🛡️ **修复 CSP 配置** - Content Security Policy阻止CDN资源和source map加载
+
+**技术改进**
+- ⚡ 侧边栏组件改用原生JavaScript，移除jQuery依赖，提升加载速度
+- 🔐 CSP的connect-src添加CDN域名支持
+- 🎯 统一API路径规范（/panel/api/inbounds/*, /panel/server/*）
+
+**影响范围**
+- ✅ 修复入站管理功能完全失效的问题
+- ✅ 修复仪表盘无法加载服务器状态的问题
+- ✅ 修复Xray重启/停止功能失败的问题
+- ✅ 消除浏览器控制台所有JavaScript错误
+
+---
 
 ### v3.1.0 (2025-11-07)
 
