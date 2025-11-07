@@ -3,8 +3,8 @@
 > **声明**: 该项目仅供学习交流使用，禁止用于非法用途，使用者与本项目开发者无关
 
 **当前版本**: v3.1.0
-**更新日期**: 2025-11-05
-**项目地址**: [gitee.com/CN-yun/yun](https://gitee.com/CN-yun/yun)
+**更新日期**: 2025-11-07
+**项目地址**: [GitHub](https://github.com/CNYuns/yun) | [Gitee](https://gitee.com/cnyuns/yun)
 
 Yun Panel 是一个支持多协议多用户的 Xray 管理面板，提供简洁易用的 Web 界面，支持 VMess、VLESS、Trojan、Shadowsocks、Socks5 等主流代理协议。
 
@@ -43,7 +43,9 @@ Yun Panel 是一个支持多协议多用户的 Xray 管理面板，提供简洁�
 ### 一键安装
 
 ```bash
-bash <(curl -Ls https://gitee.com/CN-yun/yun/raw/master/install.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/CNYuns/yun/main/install.sh)
+# 或使用 Gitee 镜像
+bash <(curl -Ls https://gitee.com/cnyuns/yun/raw/main/install.sh)
 ```
 
 安装脚本会自动：
@@ -249,7 +251,7 @@ systemctl status yun
 netstat -tunlp | grep 54321
 
 # 4. 重新安装（保留数据）
-bash <(curl -Ls https://gitee.com/CN-yun/yun/raw/master/install.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/CNYuns/yun/main/install.sh)
 ```
 
 ### Q: 如何卸载面板？
@@ -298,12 +300,11 @@ go build -ldflags "-w -s" -o yun main.go
 
 ## 📝 版本更新
 
-### v3.1.0 (2025-11-05)
+### v3.1.0 (2025-11-07)
 
 **重大更新**
 - 🎨 **前端重构** - Vue.js + Ant Design → Bootstrap 5 + jQuery
 - 🌈 **UI 美化** - 全新紫色渐变主题，响应式设计
-- 🏷️ **项目重命名** - 3x-ui → Yun Panel
 
 **安全增强**
 - 🔒 随机密码生成（crypto/rand，16位强密码）
@@ -356,8 +357,12 @@ go build -ldflags "-w -s" -o yun main.go
 
 ## 📬 联系方式
 
-- **项目地址**: https://gitee.com/CN-yun/yun
-- **Issue**: https://gitee.com/CN-yun/yun/issues
+- **项目地址**:
+  - GitHub: https://github.com/CNYuns/yun
+  - Gitee: https://gitee.com/cnyuns/yun
+- **Issue**:
+  - GitHub: https://github.com/CNYuns/yun/issues
+  - Gitee: https://gitee.com/cnyuns/yun/issues
 - **QQ 群**: [点击加入](https://qm.qq.com/q/ZEXU9SNqYm)
 - **邮箱**: admin@quanx.org
 
@@ -377,4 +382,4 @@ go build -ldflags "-w -s" -o yun main.go
 
 ---
 
-**最后更新**: 2025-11-05
+**最后更新**: 2025-11-07

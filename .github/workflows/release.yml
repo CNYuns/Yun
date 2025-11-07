@@ -5,20 +5,11 @@ on:
   release:
     types: [published]
   push:
-    branches:
-      - master
-    paths:
-      - '**.js'
-      - '**.css'
-      - '**.html'
-      - '**.sh'
-      - '**.go'
-      - 'go.mod'
-      - 'go.sum'
-      - 'yun.service'
+    tags:
+      - 'v*.*.*'
 
 jobs:
-  build:
+  build-linux:
     permissions:
       contents: write
     strategy:
@@ -154,4 +145,72 @@ jobs:
           tag: ${{ github.ref }}
           file: yun-linux-${{ matrix.platform }}.tar.gz
           asset_name: yun-linux-${{ matrix.platform }}.tar.gz
+          prerelease: true
+
+  build-windows:
+    permissions:
+      contents: write
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          check-latest: true
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-mingw-w64-x86-64
+
+      - name: Build yun for Windows
+        run: |
+          export CGO_ENABLED=1
+          export GOOS=windows
+          export GOARCH=amd64
+          export CC=x86_64-w64-mingw32-gcc
+          go build -ldflags "-w -s" -o yun-release.exe -v main.go
+
+          mkdir yun
+          cp yun-release.exe yun/yun.exe
+          mkdir yun/bin
+          cd yun/bin
+
+          # Download Windows Xray
+          Xray_URL="https://github.com/XTLS/Xray-core/releases/download/v25.6.8/"
+          wget -q ${Xray_URL}Xray-windows-64.zip
+          unzip Xray-windows-64.zip
+          rm -f Xray-windows-64.zip
+          mv xray.exe xray-windows-amd64.exe
+
+          # Download geo files
+          rm -f geoip.dat geosite.dat
+          wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat
+          wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
+          wget -q -O geoip_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geoip.dat
+          wget -q -O geosite_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geosite.dat
+          wget -q -O geoip_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geoip.dat
+          wget -q -O geosite_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat
+          cd ../..
+
+      - name: Package
+        run: zip -r yun-windows-amd64.zip yun
+
+      - name: Upload files to Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: yun-windows-amd64
+          path: ./yun-windows-amd64.zip
+
+      - name: Upload files to GH release
+        uses: svenstaro/upload-release-action@v2
+        if: github.event_name == 'release' && github.event.action == 'published'
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref }}
+          file: yun-windows-amd64.zip
+          asset_name: yun-windows-amd64.zip
           prerelease: true

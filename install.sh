@@ -199,18 +199,18 @@ install_yun() {
 
     if [ $# == 0 ]; then
         # 获取最新版本号
-        last_version="v3.0.0"
+        last_version="v3.1.0"
         echo -e "开始安装 yun ${last_version}"
 
         # 下载最新版本
-        wget -N --no-check-certificate -O /usr/local/yun-linux-${arch}.tar.gz https://gitee.com/quanx/yun/releases/download/${last_version}/yun-linux-${arch}.tar.gz
+        wget -N --no-check-certificate -O /usr/local/yun-linux-${arch}.tar.gz https://gitee.com/cnyuns/yun/releases/download/${last_version}/yun-linux-${arch}.tar.gz
 
         if [[ $? -ne 0 ]]; then
             echo -e "${red}下载 yun 失败，请确保你的服务器能够下载 Gitee 的文件${plain}"
-            echo -e "${yellow}正在尝试备用下载链接...${plain}"
+            echo -e "${yellow}正在尝试使用 GitHub 下载链接...${plain}"
 
-            # 备用下载链接
-            wget -N --no-check-certificate -O /usr/local/yun-linux-${arch}.tar.gz https://gitee.com/quanx/yun/releases/download/${last_version}/yun-linux-${arch}.tar.gz
+            # 备用下载链接（GitHub）
+            wget -N --no-check-certificate -O /usr/local/yun-linux-${arch}.tar.gz https://github.com/CNYuns/yun/releases/download/${last_version}/yun-linux-${arch}.tar.gz
 
             if [[ $? -ne 0 ]]; then
                 echo -e "${red}备用下载也失败，请手动下载并上传到服务器${plain}"
@@ -220,7 +220,7 @@ install_yun() {
     else
         # 安装指定版本
         last_version=$1
-        url="https://gitee.com/quanx/yun/releases/download/${last_version}/yun-linux-${arch}.tar.gz"
+        url="https://gitee.com/cnyuns/yun/releases/download/${last_version}/yun-linux-${arch}.tar.gz"
         echo -e "开始安装 yun v$1"
         wget -N --no-check-certificate -O /usr/local/yun-linux-${arch}.tar.gz ${url}
         if [[ $? -ne 0 ]]; then
@@ -245,7 +245,7 @@ install_yun() {
     mkdir -p /var/log/yun
 
     # 下载管理脚本
-    wget --no-check-certificate -O /usr/bin/yun https://gitee.com/quanx/yun/raw/master/yun.sh
+    wget --no-check-certificate -O /usr/bin/yun https://gitee.com/cnyuns/yun/raw/main/yun.sh
     chmod +x /usr/local/yun/yun.sh
     chmod +x /usr/bin/yun
 

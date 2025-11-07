@@ -48,11 +48,11 @@ body:
       required: false
 
   - type: input
-    id: xui-version
+    id: yun-version
     attributes:
-      label: 3x-ui Version
-      description: Which version of 3x-ui are you using?
-      placeholder: 2.X.X
+      label: Yun Panel Version
+      description: Which version of Yun Panel are you using?
+      placeholder: 3.X.X
     validations:
       required: true
 

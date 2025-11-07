@@ -85,7 +85,7 @@ before_show_menu() {
 
 # 安装面板
 install() {
-    bash <(curl -Ls https://gitee.com/quanx/yun/raw/master/install.sh)
+    bash <(curl -Ls https://gitee.com/cnyuns/yun/raw/main/install.sh)
     if [[ $? == 0 ]]; then
         if [[ $# == 0 ]]; then
             start
@@ -105,7 +105,7 @@ update() {
         fi
         return 0
     fi
-    bash <(curl -Ls https://gitee.com/quanx/yun/raw/master/install.sh)
+    bash <(curl -Ls https://gitee.com/cnyuns/yun/raw/main/install.sh)
     if [[ $? == 0 ]]; then
         echo -e "${green}更新完成，已自动重启面板${plain}"
         exit 0
@@ -303,7 +303,7 @@ install_bbr() {
 
 # 更新管理脚本
 update_shell() {
-    wget -O /usr/bin/yun -N --no-check-certificate https://gitee.com/quanx/yun/raw/master/yun.sh
+    wget -O /usr/bin/yun -N --no-check-certificate https://gitee.com/cnyuns/yun/raw/main/yun.sh
     if [[ $? != 0 ]]; then
         echo ""
         echo -e "${red}下载脚本失败，请检查本机能否连接 Gitee${plain}"
