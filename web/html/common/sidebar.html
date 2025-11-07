@@ -199,27 +199,34 @@
 </button>
 
 <script>
-$(document).ready(function() {
+// Vanilla JavaScript - no jQuery dependency
+document.addEventListener('DOMContentLoaded', function() {
   // Sidebar toggle for mobile
-  $('#sidebarToggle').on('click', function() {
-    $('#sidebar').toggleClass('show');
-  });
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const sidebar = document.getElementById('sidebar');
+
+  if (sidebarToggle && sidebar) {
+    sidebarToggle.addEventListener('click', function() {
+      sidebar.classList.toggle('show');
+    });
+  }
 
   // Close sidebar when clicking outside on mobile
-  $(document).on('click', function(e) {
-    if ($(window).width() <= 768) {
-      if (!$(e.target).closest('#sidebar, #sidebarToggle').length) {
-        $('#sidebar').removeClass('show');
+  document.addEventListener('click', function(e) {
+    if (window.innerWidth <= 768) {
+      if (!e.target.closest('#sidebar') && !e.target.closest('#sidebarToggle')) {
+        sidebar.classList.remove('show');
       }
     }
   });
 
   // Highlight active nav item based on current page
   const currentPath = window.location.pathname;
-  $('.sidebar .nav-link').each(function() {
-    const href = $(this).attr('href');
-    if (currentPath.includes($(this).data('page'))) {
-      $(this).addClass('active');
+  const navLinks = document.querySelectorAll('.sidebar .nav-link');
+  navLinks.forEach(function(link) {
+    const page = link.getAttribute('data-page');
+    if (page && currentPath.includes(page)) {
+      link.classList.add('active');
     }
   });
 });
