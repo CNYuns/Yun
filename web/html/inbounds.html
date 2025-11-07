@@ -401,7 +401,7 @@ function loadInbounds() {
   $('#loadingState').show();
   $('#tableContainer').hide();
 
-  axios.post('/panel/API/inbounds/list')
+  axios.post('/panel/api/inbounds/list')
     .then(response => {
       if (response.data.success) {
         inbounds = response.data.obj || [];
@@ -532,7 +532,7 @@ function saveInbound() {
     sniffing: '{}'
   };
 
-  const url = data.id > 0 ? `/panel/API/inbound/update/${data.id}` : '/panel/API/inbound/add';
+  const url = data.id > 0 ? `/panel/api/inbounds/update/${data.id}` : '/panel/api/inbounds/add';
 
   axios.post(url, data)
     .then(response => {
@@ -550,7 +550,7 @@ function saveInbound() {
 function deleteInbound(id) {
   if (!confirm('{{ i18n "pages.inbounds.deleteConfirm" }}')) return;
 
-  axios.post(`/panel/API/inbound/del/${id}`)
+  axios.post(`/panel/api/inbounds/del/${id}`)
     .then(response => {
       if (response.data.success) {
         showNotification('{{ i18n "deleted" }}', 'success');
@@ -564,7 +564,7 @@ function toggleInbound(id, enable) {
   if (!inbound) return;
 
   inbound.enable = enable;
-  axios.post(`/panel/API/inbound/update/${id}`, inbound)
+  axios.post(`/panel/api/inbounds/update/${id}`, inbound)
     .then(response => {
       if (response.data.success) {
         loadInbounds();

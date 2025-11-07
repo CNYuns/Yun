@@ -363,7 +363,7 @@ $(document).ready(function() {
 });
 
 function loadData() {
-  axios.post('/panel/API/serverStatus', {}, { hideLoader: true })
+  axios.post('/panel/server/status', {}, { hideLoader: true })
     .then(response => {
       if (response.data.success) {
         updateUI(response.data.obj);
@@ -443,7 +443,7 @@ function restartXray() {
   if (!confirm('{{ i18n "pages.index.restartXrayConfirm" }}')) return;
 
   showLoading();
-  axios.post('/panel/API/xray/restart')
+  axios.post('/panel/server/restartXrayService')
     .then(response => {
       if (response.data.success) {
         showNotification('{{ i18n "pages.index.restartXraySuccess" }}', 'success');
@@ -459,7 +459,7 @@ function stopXray() {
   if (!confirm('{{ i18n "pages.index.stopXrayConfirm" }}')) return;
 
   showLoading();
-  axios.post('/panel/API/xray/stop')
+  axios.post('/panel/server/stopXrayService')
     .then(response => {
       if (response.data.success) {
         showNotification('{{ i18n "pages.index.stopXraySuccess" }}', 'success');
