@@ -9,19 +9,18 @@ stages:
       - step: build@golang
         name: build_golang
         displayName: Golang 构建
-        # Go版本1.21
-        golangVersion: '1.21'
+        # Go版本1.24
+        golangVersion: '1.24'
         # 构建命令
         commands: |
           #!/bin/bash
           set -e
 
           echo "===== 配置Go环境 ====="
-          # 强制使用国内镜像，禁止直连
+          # 强制使用国内镜像
           export GOPROXY=https://goproxy.cn,https://goproxy.io
           export GOSUMDB=sum.golang.google.cn
           export GO111MODULE=on
-          export GOTOOLCHAIN=local
           export GONOPROXY=""
           export GONOSUMDB=""
           export GOPRIVATE=""
