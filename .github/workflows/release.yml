@@ -17,11 +17,6 @@ jobs:
         platform:
           - amd64
           - arm64
-          - armv7
-          - armv6
-          - 386
-          - armv5
-          - s390x
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
@@ -161,6 +156,11 @@ jobs:
   build-windows:
     permissions:
       contents: write
+    strategy:
+      matrix:
+        arch:
+          - amd64
+          - 386
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
@@ -175,14 +175,22 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-mingw-w64-x86-64
+          if [ "${{ matrix.arch }}" == "amd64" ]; then
+            sudo apt-get install -y gcc-mingw-w64-x86-64
+          else
+            sudo apt-get install -y gcc-mingw-w64-i686
+          fi
 
       - name: Build yun for Windows
         run: |
           export CGO_ENABLED=1
           export GOOS=windows
-          export GOARCH=amd64
-          export CC=x86_64-w64-mingw32-gcc
+          export GOARCH=${{ matrix.arch }}
+          if [ "${{ matrix.arch }}" == "amd64" ]; then
+            export CC=x86_64-w64-mingw32-gcc
+          else
+            export CC=i686-w64-mingw32-gcc
+          fi
           go build -ldflags "-w -s" -o yun-release.exe -v main.go
 
           mkdir yun
@@ -192,10 +200,17 @@ jobs:
 
           # Download Windows Xray
           Xray_URL="https://github.com/XTLS/Xray-core/releases/download/v25.6.8/"
-          wget -q ${Xray_URL}Xray-windows-64.zip
-          unzip Xray-windows-64.zip
-          rm -f Xray-windows-64.zip
-          mv xray.exe xray-windows-amd64.exe
+          if [ "${{ matrix.arch }}" == "amd64" ]; then
+            wget -q ${Xray_URL}Xray-windows-64.zip
+            unzip Xray-windows-64.zip
+            rm -f Xray-windows-64.zip
+            mv xray.exe xray-windows-amd64.exe
+          else
+            wget -q ${Xray_URL}Xray-windows-32.zip
+            unzip Xray-windows-32.zip
+            rm -f Xray-windows-32.zip
+            mv xray.exe xray-windows-386.exe
+          fi
 
           # Download geo files
           rm -f geoip.dat geosite.dat
@@ -208,13 +223,13 @@ jobs:
           cd ../..
 
       - name: Package
-        run: zip -r yun-windows-amd64.zip yun
+        run: zip -r yun-windows-${{ matrix.arch }}.zip yun
 
       - name: Upload files to Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: yun-windows-amd64
-          path: ./yun-windows-amd64.zip
+          name: yun-windows-${{ matrix.arch }}
+          path: ./yun-windows-${{ matrix.arch }}.zip
 
       - name: Upload files to GH release
         uses: svenstaro/upload-release-action@v2
@@ -222,8 +237,8 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref }}
-          file: yun-windows-amd64.zip
-          asset_name: yun-windows-amd64.zip
+          file: yun-windows-${{ matrix.arch }}.zip
+          asset_name: yun-windows-${{ matrix.arch }}.zip
           prerelease: false
           overwrite: true
           make_latest: true

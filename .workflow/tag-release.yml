@@ -35,25 +35,21 @@ stages:
             # 创建输出目录
             mkdir -p output
 
-            # 构建Linux amd64
+            # 构建Linux amd64（最常用）
             echo "Building Linux amd64..."
             CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-w -s" -o output/yun-linux-amd64 main.go
 
-            # 构建Linux arm64
+            # 构建Linux arm64（ARM服务器）
             echo "Building Linux arm64..."
             CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags "-w -s" -o output/yun-linux-arm64 main.go
 
-            # 构建Linux armv7
-            echo "Building Linux armv7..."
-            CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 go build -ldflags "-w -s" -o output/yun-linux-armv7 main.go
-
-            # 构建Linux 386
-            echo "Building Linux 386..."
-            CGO_ENABLED=0 GOOS=linux GOARCH=386 go build -ldflags "-w -s" -o output/yun-linux-386 main.go
-
-            # 构建Windows amd64
+            # 构建Windows amd64（64位）
             echo "Building Windows amd64..."
             CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags "-w -s" -o output/yun-windows-amd64.exe main.go
+
+            # 构建Windows 386（32位）
+            echo "Building Windows 386..."
+            CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -ldflags "-w -s" -o output/yun-windows-386.exe main.go
 
             echo "===== 构建完成 ====="
             ls -lh output/
@@ -100,30 +96,19 @@ stages:
             tar -czf yun-linux-arm64.tar.gz yun-linux-arm64-dir/
             rm -rf yun-linux-arm64-dir
 
-            # 打包Linux armv7
-            echo "Packaging Linux armv7..."
-            mkdir yun-linux-armv7-dir
-            cp yun-linux-armv7 yun-linux-armv7-dir/yun
-            cp ../yun.service yun-linux-armv7-dir/ || true
-            cp ../yun.sh yun-linux-armv7-dir/ || true
-            tar -czf yun-linux-armv7.tar.gz yun-linux-armv7-dir/
-            rm -rf yun-linux-armv7-dir
-
-            # 打包Linux 386
-            echo "Packaging Linux 386..."
-            mkdir yun-linux-386-dir
-            cp yun-linux-386 yun-linux-386-dir/yun
-            cp ../yun.service yun-linux-386-dir/ || true
-            cp ../yun.sh yun-linux-386-dir/ || true
-            tar -czf yun-linux-386.tar.gz yun-linux-386-dir/
-            rm -rf yun-linux-386-dir
-
             # 打包Windows amd64
             echo "Packaging Windows amd64..."
             mkdir yun-windows-amd64-dir
             cp yun-windows-amd64.exe yun-windows-amd64-dir/yun.exe
             zip -r yun-windows-amd64.zip yun-windows-amd64-dir/
             rm -rf yun-windows-amd64-dir
+
+            # 打包Windows 386
+            echo "Packaging Windows 386..."
+            mkdir yun-windows-386-dir
+            cp yun-windows-386.exe yun-windows-386-dir/yun.exe
+            zip -r yun-windows-386.zip yun-windows-386-dir/
+            rm -rf yun-windows-386-dir
 
             echo "===== 打包完成 ====="
             ls -lh *.tar.gz *.zip
@@ -154,8 +139,13 @@ stages:
 
             ### 📦 支持的平台
 
-            - **Linux**: amd64, arm64, armv7, 386
-            - **Windows**: amd64
+            **Linux:**
+            - amd64 (x86_64) - 适用于大多数Linux服务器
+            - arm64 (aarch64) - 适用于ARM架构服务器
+
+            **Windows:**
+            - amd64 (64位) - 适用于64位Windows系统
+            - 386 (32位) - 适用于32位Windows系统
 
             ### 🚀 快速安装
 
@@ -170,7 +160,7 @@ stages:
             ```
 
             **Windows:**
-            1. 下载 `yun-windows-amd64.zip`
+            1. 下载对应架构的 zip 文件（64位选 amd64，32位选 386）
             2. 解压后运行 `yun.exe`
 
             ### 📝 更新日志

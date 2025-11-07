@@ -19,11 +19,8 @@ chmod +x build-quick.sh
 **输出文件：** `yun-linux-{platform}.tar.gz`
 
 **支持的平台：**
-- amd64（x86_64）
-- arm64（aarch64）
-- armv7
-- armv6
-- 386（i386/i686）
+- Linux: amd64（x86_64）, arm64（aarch64）
+- Windows: amd64（64位）, 386（32位）
 
 ---
 
@@ -40,18 +37,14 @@ chmod +x build.sh
 ```
 
 **构建的平台：**
-- Linux: amd64, arm64, armv7, armv6, armv5, 386, s390x
-- Windows: amd64
+- Linux: amd64, arm64
+- Windows: amd64, 386
 
 **输出文件：**
 - `yun-linux-amd64.tar.gz`
 - `yun-linux-arm64.tar.gz`
-- `yun-linux-armv7.tar.gz`
-- `yun-linux-armv6.tar.gz`
-- `yun-linux-armv5.tar.gz`
-- `yun-linux-386.tar.gz`
-- `yun-linux-s390x.tar.gz`
 - `yun-windows-amd64.zip`
+- `yun-windows-386.zip`
 
 ---
 

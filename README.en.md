@@ -59,8 +59,10 @@ The installation script will automatically:
 
 ### System Requirements
 
-- **Operating System**: Linux (Ubuntu, Debian, CentOS, Fedora, Arch, Alpine, OpenSUSE, etc.)
-- **Architecture**: amd64, arm64, armv7, armv6, armv5, 386, s390x
+- **Operating System**: Linux (Ubuntu, Debian, CentOS, Fedora, Arch, Alpine, OpenSUSE, etc.) / Windows
+- **Architecture**:
+  - Linux: amd64, arm64
+  - Windows: amd64, 386
 - **Minimum Configuration**: 1 CPU core, 512MB memory, 10GB hard disk
 
 ---

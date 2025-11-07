@@ -59,8 +59,10 @@ bash <(curl -Ls https://gitee.com/cnyuns/yun/raw/main/install.sh)
 
 ### 系统要求
 
-- **操作系统**: Linux (Ubuntu, Debian, CentOS, Fedora, Arch, Alpine, OpenSUSE 等)
-- **架构**: amd64, arm64, armv7, armv6, armv5, 386, s390x
+- **操作系统**: Linux (Ubuntu, Debian, CentOS, Fedora, Arch, Alpine, OpenSUSE 等) / Windows
+- **架构**:
+  - Linux: amd64, arm64
+  - Windows: amd64, 386
 - **最低配置**: 1核 CPU, 512MB 内存, 10GB 硬盘
 
 ---
