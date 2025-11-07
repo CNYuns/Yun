@@ -1,0 +1,184 @@
+version: '1.0'
+name: tag-release
+displayName: Tag发布流水线
+
+# 仅在推送tag时触发
+triggers:
+  push:
+    tags:
+      include:
+        - v*.*.*
+
+stages:
+  # 阶段1：构建
+  - stage:
+      name: build
+      displayName: 编译构建
+      steps:
+        - step: build@golang
+          name: build_releases
+          displayName: Go编译
+          # Go版本（Gitee支持的最高版本）
+          golangVersion: '1.16'
+          commands: |
+            #!/bin/bash
+            set -e
+
+            echo "===== 开始构建 ====="
+            echo "Go version:"
+            go version
+
+            # 读取版本号
+            VERSION=$(cat config/version)
+            echo "Building Yun Panel v$VERSION"
+
+            # 创建输出目录
+            mkdir -p output
+
+            # 构建Linux amd64
+            echo "Building Linux amd64..."
+            CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-w -s" -o output/yun-linux-amd64 main.go
+
+            # 构建Linux arm64
+            echo "Building Linux arm64..."
+            CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags "-w -s" -o output/yun-linux-arm64 main.go
+
+            # 构建Linux armv7
+            echo "Building Linux armv7..."
+            CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 go build -ldflags "-w -s" -o output/yun-linux-armv7 main.go
+
+            # 构建Linux 386
+            echo "Building Linux 386..."
+            CGO_ENABLED=0 GOOS=linux GOARCH=386 go build -ldflags "-w -s" -o output/yun-linux-386 main.go
+
+            # 构建Windows amd64
+            echo "Building Windows amd64..."
+            CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags "-w -s" -o output/yun-windows-amd64.exe main.go
+
+            echo "===== 构建完成 ====="
+            ls -lh output/
+
+          # 保存构建产物
+          artifacts:
+            - name: BUILD_OUTPUT
+              path:
+                - ./output
+
+  # 阶段2：打包
+  - stage:
+      name: package
+      displayName: 打包
+      steps:
+        - step: build@shell
+          name: package_files
+          displayName: 打包文件
+          # 使用上一阶段的产物
+          dependArtifact: BUILD_OUTPUT
+          commands: |
+            #!/bin/bash
+            set -e
+
+            echo "===== 开始打包 ====="
+
+            cd output
+
+            # 打包Linux amd64
+            echo "Packaging Linux amd64..."
+            mkdir yun-linux-amd64-dir
+            cp yun-linux-amd64 yun-linux-amd64-dir/yun
+            cp ../yun.service yun-linux-amd64-dir/ || true
+            cp ../yun.sh yun-linux-amd64-dir/ || true
+            tar -czf yun-linux-amd64.tar.gz yun-linux-amd64-dir/
+            rm -rf yun-linux-amd64-dir
+
+            # 打包Linux arm64
+            echo "Packaging Linux arm64..."
+            mkdir yun-linux-arm64-dir
+            cp yun-linux-arm64 yun-linux-arm64-dir/yun
+            cp ../yun.service yun-linux-arm64-dir/ || true
+            cp ../yun.sh yun-linux-arm64-dir/ || true
+            tar -czf yun-linux-arm64.tar.gz yun-linux-arm64-dir/
+            rm -rf yun-linux-arm64-dir
+
+            # 打包Linux armv7
+            echo "Packaging Linux armv7..."
+            mkdir yun-linux-armv7-dir
+            cp yun-linux-armv7 yun-linux-armv7-dir/yun
+            cp ../yun.service yun-linux-armv7-dir/ || true
+            cp ../yun.sh yun-linux-armv7-dir/ || true
+            tar -czf yun-linux-armv7.tar.gz yun-linux-armv7-dir/
+            rm -rf yun-linux-armv7-dir
+
+            # 打包Linux 386
+            echo "Packaging Linux 386..."
+            mkdir yun-linux-386-dir
+            cp yun-linux-386 yun-linux-386-dir/yun
+            cp ../yun.service yun-linux-386-dir/ || true
+            cp ../yun.sh yun-linux-386-dir/ || true
+            tar -czf yun-linux-386.tar.gz yun-linux-386-dir/
+            rm -rf yun-linux-386-dir
+
+            # 打包Windows amd64
+            echo "Packaging Windows amd64..."
+            mkdir yun-windows-amd64-dir
+            cp yun-windows-amd64.exe yun-windows-amd64-dir/yun.exe
+            zip -r yun-windows-amd64.zip yun-windows-amd64-dir/
+            rm -rf yun-windows-amd64-dir
+
+            echo "===== 打包完成 ====="
+            ls -lh *.tar.gz *.zip
+
+          artifacts:
+            - name: RELEASE_PACKAGES
+              path:
+                - ./output/*.tar.gz
+                - ./output/*.zip
+
+  # 阶段3：上传到Release
+  - stage:
+      name: release
+      displayName: 发布Release
+      steps:
+        - step: publish@release_artifacts
+          name: upload_release
+          displayName: 上传Release文件
+          # 使用打包阶段的产物
+          dependArtifact: RELEASE_PACKAGES
+          # 使用Git标签作为版本号
+          version: '${GIT_TAG}'
+          # Release说明
+          releaseNote: |
+            ## Yun Panel ${GIT_TAG}
+
+            自动构建的多平台发布版本。
+
+            ### 📦 支持的平台
+
+            - **Linux**: amd64, arm64, armv7, 386
+            - **Windows**: amd64
+
+            ### 🚀 快速安装
+
+            **Linux 一键安装:**
+            ```bash
+            bash <(curl -Ls https://raw.githubusercontent.com/CNYuns/yun/main/install.sh)
+            ```
+
+            **或使用 Gitee 镜像:**
+            ```bash
+            bash <(curl -Ls https://gitee.com/cnyuns/yun/raw/main/install.sh)
+            ```
+
+            **Windows:**
+            1. 下载 `yun-windows-amd64.zip`
+            2. 解压后运行 `yun.exe`
+
+            ### 📝 更新日志
+
+            请查看 [README.md](https://github.com/CNYuns/yun/blob/main/README.md) 的版本更新章节。
+
+            ### 🔗 相关链接
+
+            - GitHub: https://github.com/CNYuns/yun
+            - Gitee: https://gitee.com/cnyuns/yun
+            - 文档: https://github.com/CNYuns/yun/blob/main/README.md
