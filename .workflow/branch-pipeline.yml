@@ -17,27 +17,26 @@ stages:
           set -e
 
           echo "===== 配置Go环境 ====="
-          # 配置国内镜像加速
-          export GOPROXY=https://goproxy.cn,https://goproxy.io,direct
+          # 强制使用国内镜像，禁止直连
+          export GOPROXY=https://goproxy.cn,https://goproxy.io
           export GOSUMDB=sum.golang.google.cn
           export GO111MODULE=on
           export GOTOOLCHAIN=local
+          export GONOPROXY=""
+          export GONOSUMDB=""
+          export GOPRIVATE=""
 
           echo "Go version:"
           go version
-
-          # 预下载依赖
-          echo "===== 下载依赖 ====="
-          go mod download || { echo "依赖下载失败，尝试清理缓存"; go clean -modcache; go mod download; }
 
           # 创建输出目录
           mkdir -p output
 
           echo "===== 开始构建 ====="
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-w -s" -trimpath -o output/yun-linux-amd64 main.go
-          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags "-w -s" -trimpath -o output/yun-linux-arm64 main.go
-          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags "-w -s" -trimpath -o output/yun-windows-amd64.exe main.go
-          CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -ldflags "-w -s" -trimpath -o output/yun-windows-386.exe main.go
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=readonly -ldflags "-w -s" -trimpath -o output/yun-linux-amd64 main.go
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -mod=readonly -ldflags "-w -s" -trimpath -o output/yun-linux-arm64 main.go
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -mod=readonly -ldflags "-w -s" -trimpath -o output/yun-windows-amd64.exe main.go
+          CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -mod=readonly -ldflags "-w -s" -trimpath -o output/yun-windows-386.exe main.go
 
           echo "===== 构建完成 ====="
           ls -lh output/
