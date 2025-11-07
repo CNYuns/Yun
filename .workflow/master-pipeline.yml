@@ -17,15 +17,29 @@ stages:
         - step: build@golang
           name: build_main
           displayName: Go构建测试
-          golangVersion: '1.16'
+          golangVersion: '1.21'
           commands: |
+            #!/bin/bash
+            set -e
+
+            echo "===== 配置Go环境 ====="
+            export GOPROXY=https://goproxy.cn,https://goproxy.io,direct
+            export GOSUMDB=sum.golang.google.cn
+            export GO111MODULE=on
+
             echo "===== 开始构建测试 ====="
             go version
-            go build -o yun-test main.go
+            echo "GOPROXY: $GOPROXY"
+
+            # 预下载依赖
+            go mod download || { echo "依赖下载失败，尝试清理缓存"; go clean -modcache; go mod download; }
+
+            # 构建测试
+            CGO_ENABLED=0 go build -ldflags "-w -s" -trimpath -o yun-test main.go
             echo "✓ 构建成功"
 
             # 显示版本号
-            VERSION=$(cat config/version)
+            VERSION=$(cat config/version | tr -d '\n\r')
             echo "当前版本: $VERSION"
             echo "===== 构建测试完成 ====="
 

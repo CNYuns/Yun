@@ -2,7 +2,7 @@
 
 > **Disclaimer**: This project is for learning and communication purposes only. It is prohibited for illegal use. Users are not related to the project developers.
 
-**Current Version**: v3.1.3
+**Current Version**: v3.1.4
 **Update Date**: 2025-11-08
 **Project**: [GitHub](https://github.com/CNYuns/yun) | [Gitee](https://gitee.com/cnyuns/yun)
 
@@ -240,6 +240,16 @@ If you like this project, please give it a Star ⭐!
 ---
 
 ## 📝 Changelog
+
+### v3.1.4 (2025-11-08)
+
+**Pipeline Fixes**
+- 🔧 **Fixed All Gitee Go Pipeline Configurations** - Unified upgrade to Go 1.21
+- 🚀 **Fixed branch-pipeline.yml** - Go 1.12 → 1.21, added GOPROXY configuration
+- ⚡ **Fixed master-pipeline.yml** - Go 1.16 → 1.21, added GOPROXY configuration
+- 🎯 **Optimized Build Commands** - All pipelines use consistent build parameters and mirror configuration
+
+---
 
 ### v3.1.3 (2025-11-08)
 
