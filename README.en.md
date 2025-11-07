@@ -2,7 +2,7 @@
 
 > **Disclaimer**: This project is for learning and communication purposes only. It is prohibited for illegal use. Users are not related to the project developers.
 
-**Current Version**: v3.1.2
+**Current Version**: v3.1.3
 **Update Date**: 2025-11-08
 **Project**: [GitHub](https://github.com/CNYuns/yun) | [Gitee](https://gitee.com/cnyuns/yun)
 
@@ -240,6 +240,15 @@ If you like this project, please give it a Star ⭐!
 ---
 
 ## 📝 Changelog
+
+### v3.1.3 (2025-11-08)
+
+**Build Fixes**
+- 🔧 **Fixed Gitee Go Pipeline Build Failure** - Go version upgraded from 1.16 to 1.21
+- 🚀 **Configured GOPROXY China Mirrors** - Using goproxy.cn and goproxy.io for acceleration
+- ⚡ **Optimized Build Process** - Added dependency pre-download and error handling
+
+---
 
 ### v3.1.2 (2025-11-08)
 
