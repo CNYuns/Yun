@@ -10,10 +10,10 @@ triggers:
         - v*.*.*
 
 stages:
-  # 阶段1：构建
+  # 阶段1：构建并打包
   - stage:
-      name: build
-      displayName: 编译构建
+      name: build_and_package
+      displayName: 编译并打包
       steps:
         - step: build@golang
           name: build_releases
@@ -42,95 +42,61 @@ stages:
             echo "Building Yun Panel v$VERSION"
 
             # 创建输出目录
-            mkdir -p output
+            mkdir -p release
 
             echo "===== 开始构建 ====="
 
-            # 构建Linux amd64（最常用）
+            # 构建Linux amd64
             echo "Building Linux amd64..."
-            CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=readonly -ldflags "-w -s" -trimpath -o output/yun-linux-amd64 main.go
+            CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=readonly -ldflags "-w -s" -trimpath -o yun main.go
+            mkdir -p yun-linux-amd64
+            cp yun yun-linux-amd64/
+            cp yun.service yun-linux-amd64/ || true
+            cp yun.sh yun-linux-amd64/ || true
+            tar -czf release/yun-linux-amd64.tar.gz yun-linux-amd64/
+            rm -rf yun-linux-amd64 yun
+            echo "✓ Linux amd64 打包完成"
 
-            # 构建Linux arm64（ARM服务器）
+            # 构建Linux arm64
             echo "Building Linux arm64..."
-            CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -mod=readonly -ldflags "-w -s" -trimpath -o output/yun-linux-arm64 main.go
+            CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -mod=readonly -ldflags "-w -s" -trimpath -o yun main.go
+            mkdir -p yun-linux-arm64
+            cp yun yun-linux-arm64/
+            cp yun.service yun-linux-arm64/ || true
+            cp yun.sh yun-linux-arm64/ || true
+            tar -czf release/yun-linux-arm64.tar.gz yun-linux-arm64/
+            rm -rf yun-linux-arm64 yun
+            echo "✓ Linux arm64 打包完成"
 
-            # 构建Windows amd64（64位）
+            # 构建Windows amd64
             echo "Building Windows amd64..."
-            CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -mod=readonly -ldflags "-w -s" -trimpath -o output/yun-windows-amd64.exe main.go
+            CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -mod=readonly -ldflags "-w -s" -trimpath -o yun.exe main.go
+            mkdir -p yun-windows-amd64
+            cp yun.exe yun-windows-amd64/
+            cd yun-windows-amd64 && zip -r ../release/yun-windows-amd64.zip . && cd ..
+            rm -rf yun-windows-amd64 yun.exe
+            echo "✓ Windows amd64 打包完成"
 
-            # 构建Windows 386（32位）
+            # 构建Windows 386
             echo "Building Windows 386..."
-            CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -mod=readonly -ldflags "-w -s" -trimpath -o output/yun-windows-386.exe main.go
+            CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -mod=readonly -ldflags "-w -s" -trimpath -o yun.exe main.go
+            mkdir -p yun-windows-386
+            cp yun.exe yun-windows-386/
+            cd yun-windows-386 && zip -r ../release/yun-windows-386.zip . && cd ..
+            rm -rf yun-windows-386 yun.exe
+            echo "✓ Windows 386 打包完成"
 
             echo "===== 构建完成 ====="
-            ls -lh output/
+            ls -lh release/
 
           # 保存构建产物
           artifacts:
-            - name: BUILD_OUTPUT
+            - name: RELEASE_FILES
               path:
-                - ./output
+                - ./release/*.tar.gz
+                - ./release/*.zip
 
-  # 阶段2：打包
-  - stage:
-      name: package
-      displayName: 打包
-      steps:
-        - step: build@shell
-          name: package_files
-          displayName: 打包文件
-          # 使用上一阶段的产物
-          dependArtifact: BUILD_OUTPUT
-          commands: |
-            #!/bin/bash
-            set -e
-
-            echo "===== 开始打包 ====="
-
-            cd output
-
-            # 打包Linux amd64
-            echo "Packaging Linux amd64..."
-            mkdir yun-linux-amd64-dir
-            cp yun-linux-amd64 yun-linux-amd64-dir/yun
-            cp ../yun.service yun-linux-amd64-dir/ || true
-            cp ../yun.sh yun-linux-amd64-dir/ || true
-            tar -czf yun-linux-amd64.tar.gz yun-linux-amd64-dir/
-            rm -rf yun-linux-amd64-dir
-
-            # 打包Linux arm64
-            echo "Packaging Linux arm64..."
-            mkdir yun-linux-arm64-dir
-            cp yun-linux-arm64 yun-linux-arm64-dir/yun
-            cp ../yun.service yun-linux-arm64-dir/ || true
-            cp ../yun.sh yun-linux-arm64-dir/ || true
-            tar -czf yun-linux-arm64.tar.gz yun-linux-arm64-dir/
-            rm -rf yun-linux-arm64-dir
-
-            # 打包Windows amd64
-            echo "Packaging Windows amd64..."
-            mkdir yun-windows-amd64-dir
-            cp yun-windows-amd64.exe yun-windows-amd64-dir/yun.exe
-            zip -r yun-windows-amd64.zip yun-windows-amd64-dir/
-            rm -rf yun-windows-amd64-dir
-
-            # 打包Windows 386
-            echo "Packaging Windows 386..."
-            mkdir yun-windows-386-dir
-            cp yun-windows-386.exe yun-windows-386-dir/yun.exe
-            zip -r yun-windows-386.zip yun-windows-386-dir/
-            rm -rf yun-windows-386-dir
-
-            echo "===== 打包完成 ====="
-            ls -lh *.tar.gz *.zip
-
-          artifacts:
-            - name: RELEASE_PACKAGES
-              path:
-                - ./output/*.tar.gz
-                - ./output/*.zip
-
-  # 阶段3：上传到Release
+  # 阶段2：上传到Release
   - stage:
       name: release
       displayName: 发布Release
@@ -138,8 +104,8 @@ stages:
         - step: publish@release_artifacts
           name: upload_release
           displayName: 上传Release文件
-          # 使用打包阶段的产物
-          dependArtifact: RELEASE_PACKAGES
+          # 使用构建阶段的产物
+          dependArtifact: RELEASE_FILES
           # 使用Git标签作为版本号
           version: '${GIT_TAG}'
           # Release说明
@@ -176,10 +142,10 @@ stages:
 
             ### 📝 更新日志
 
-            请查看 [README.md](https://github.com/CNYuns/yun/blob/main/README.md) 的版本更新章节。
+            请查看 [README.md](https://gitee.com/cnyuns/yun/blob/main/README.md) 的版本更新章节。
 
             ### 🔗 相关链接
 
             - GitHub: https://github.com/CNYuns/yun
             - Gitee: https://gitee.com/cnyuns/yun
-            - 文档: https://github.com/CNYuns/yun/blob/main/README.md
+            - 文档: https://gitee.com/cnyuns/yun/blob/main/README.md
