@@ -1,6 +1,8 @@
 module yun
 
-go 1.24
+go 1.21
+
+toolchain go1.21.0
 
 require (
 	github.com/gin-contrib/gzip v1.2.3
