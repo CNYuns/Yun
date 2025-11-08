@@ -2,7 +2,7 @@
 
 > **Disclaimer**: This project is for learning and communication purposes only. It is prohibited for illegal use. Users are not related to the project developers.
 
-**Current Version**: v3.1.4
+**Current Version**: v3.1.5
 **Update Date**: 2025-11-08
 **Project**: [GitHub](https://github.com/CNYuns/yun) | [Gitee](https://gitee.com/cnyuns/yun)
 
@@ -240,6 +240,21 @@ If you like this project, please give it a Star ⭐!
 ---
 
 ## 📝 Changelog
+
+### v3.1.5 (2025-11-08)
+
+**Gitee Pipeline Fixes**
+- 🔧 **Fixed Artifact Packaging** - Generate independent archives directly in build directory, avoid Gitee auto-packaging
+- 📦 **Fixed File Output** - Linux versions output tar.gz, Windows versions output zip
+- 🚀 **Fixed Release Publishing** - Fixed publish@release_artifacts configuration, auto-upload 4 independent files
+- ✅ **Artifact Optimization** - Removed intermediate release directory, generate final artifacts directly
+
+**Technical Improvements**
+- Changed artifacts.path to specific file list, avoid wildcard packaging issues
+- Changed dependArtifact to BUILD_ARTIFACT, ensure correct artifact transfer
+- Unified archive naming: yun-linux-amd64.tar.gz, yun-windows-amd64.zip
+
+---
 
 ### v3.1.4 (2025-11-08)
 
